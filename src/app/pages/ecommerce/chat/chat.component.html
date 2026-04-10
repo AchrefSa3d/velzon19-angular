@@ -1,0 +1,132 @@
+<app-breadcrumbs [title]="'Chat avec les Vendeurs'" [breadcrumbItems]="breadCrumbItems"></app-breadcrumbs>
+
+<div class="card border-0 shadow-sm overflow-hidden" style="height:70vh">
+  <div class="row g-0 h-100">
+
+    <!-- ─── SIDEBAR vendeurs ────────────────────── -->
+    <div class="col-md-4 col-lg-3 border-end h-100 d-flex flex-column">
+      <div class="p-3 border-bottom">
+        <h6 class="fw-bold mb-0"><i class="ri-store-2-line me-2 text-primary"></i>Vendeurs</h6>
+      </div>
+      <div class="overflow-auto flex-grow-1">
+        @for (v of vendors; track v.id) {
+          <div class="d-flex align-items-center gap-3 p-3 border-bottom"
+               [class.bg-primary-subtle]="v.id === activeVendorId"
+               style="cursor:pointer" (click)="selectVendor(v.id)">
+            <div class="position-relative">
+              <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white fw-bold"
+                   style="width:42px;height:42px;min-width:42px;font-size:12px">
+                {{ v.avatar }}
+              </div>
+              <span class="position-absolute bottom-0 end-0 rounded-circle border border-white"
+                    style="width:12px;height:12px;background:{{ v.online ? '#0ab39c' : '#adb5bd' }}"></span>
+            </div>
+            <div class="flex-grow-1 overflow-hidden">
+              <div class="fw-semibold small">{{ v.shop }}</div>
+              <div class="text-muted text-truncate" style="font-size:11px">
+                {{ lastMessage(v) | slice:0:28 }}{{ lastMessage(v).length > 28 ? '...' : '' }}
+              </div>
+            </div>
+            @if (v.id === activeVendorId) {
+              <i class="ri-arrow-right-s-line text-primary"></i>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- ─── ZONE DE CHAT ────────────────────────── -->
+    <div class="col-md-8 col-lg-9 d-flex flex-column h-100">
+
+      <!-- Header vendeur actif -->
+      @if (activeVendor) {
+        <div class="p-3 border-bottom d-flex align-items-center justify-content-between bg-white">
+          <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white fw-bold"
+                 style="width:42px;height:42px;font-size:12px">
+              {{ activeVendor.avatar }}
+            </div>
+            <div>
+              <div class="fw-bold">{{ activeVendor.shop }}</div>
+              <div style="font-size:12px">
+                <span class="rounded-circle d-inline-block me-1"
+                      style="width:8px;height:8px;background:{{ activeVendor.online ? '#0ab39c' : '#adb5bd' }}"></span>
+                <span class="text-muted">{{ activeVendor.name }} ·
+                  <span [class.text-success]="activeVendor.online"
+                        [class.text-muted]="!activeVendor.online">
+                    {{ activeVendor.online ? 'En ligne' : 'Hors ligne' }}
+                  </span>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex gap-2">
+            <span class="badge bg-light text-dark">{{ activeVendor.category }}</span>
+            <button class="btn btn-sm btn-soft-danger" (click)="clearChat()" ngbTooltip="Effacer la conversation">
+              <i class="ri-delete-bin-line"></i>
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Messages -->
+      <div #messagesContainer class="flex-grow-1 overflow-auto p-3"
+           style="background:#f8f9fa">
+        @if (activeVendor) {
+          @for (msg of activeVendor.messages; track $index) {
+            <div class="d-flex mb-3 {{ msg.from === 'user' ? 'justify-content-end' : 'justify-content-start' }}">
+              @if (msg.from === 'vendor') {
+                <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white fw-bold me-2 flex-shrink-0"
+                     style="width:34px;height:34px;font-size:11px;align-self:flex-end">
+                  {{ activeVendor.avatar }}
+                </div>
+              }
+              <div>
+                <div class="rounded-3 px-3 py-2 {{ msg.from === 'user'
+                      ? 'bg-primary text-white'
+                      : 'bg-white border' }}"
+                     style="max-width:360px;word-wrap:break-word">
+                  {{ msg.text }}
+                </div>
+                <div class="text-muted mt-1 {{ msg.from === 'user' ? 'text-end' : '' }}"
+                     style="font-size:10px">{{ msg.time }}</div>
+              </div>
+              @if (msg.from === 'user') {
+                <div class="rounded-circle bg-success d-flex align-items-center justify-content-center text-white fw-bold ms-2 flex-shrink-0"
+                     style="width:34px;height:34px;font-size:11px;align-self:flex-end">
+                  {{ (currentUser.firstName || 'U').charAt(0).toUpperCase() }}
+                </div>
+              }
+            </div>
+          }
+          @if (activeVendor.messages.length === 0) {
+            <div class="text-center py-5 text-muted">
+              <i class="ri-chat-3-line display-3 d-block mb-2"></i>
+              Aucun message. Envoyez votre premier message !
+            </div>
+          }
+        }
+      </div>
+
+      <!-- Input message -->
+      <div class="p-3 border-top bg-white">
+        @if (activeVendor && !activeVendor.online) {
+          <div class="alert alert-warning py-2 small mb-2 text-center">
+            <i class="ri-time-line me-1"></i>{{ activeVendor.name }} est hors ligne — votre message sera envoyé.
+          </div>
+        }
+        <div class="d-flex gap-2">
+          <input type="text" class="form-control" [(ngModel)]="newMessage"
+                 placeholder="Écrivez votre message..."
+                 (keydown.enter)="onEnter($event)">
+          <button class="btn btn-primary px-3" (click)="sendMessage()" [disabled]="!newMessage.trim()">
+            <i class="ri-send-plane-fill"></i>
+          </button>
+        </div>
+        <div class="text-muted mt-1" style="font-size:11px">
+          Appuyez sur Entrée ou cliquez sur le bouton pour envoyer
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

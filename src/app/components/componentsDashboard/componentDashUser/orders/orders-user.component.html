@@ -1,0 +1,216 @@
+<app-breadcrumbs title="Mes Commandes" [breadcrumbItems]="breadcrumbItems"></app-breadcrumbs>
+
+<!-- Stats Header -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm text-center py-3">
+      <div class="fs-26 fw-bold text-primary">{{ allOrders.length }}</div>
+      <div class="text-muted fs-13">Total</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm text-center py-3">
+      <div class="fs-26 fw-bold text-success">{{ countByStatus('Livrée') }}</div>
+      <div class="text-muted fs-13">Livrées</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm text-center py-3">
+      <div class="fs-26 fw-bold text-info">{{ countByStatus('Expédiée') }}</div>
+      <div class="text-muted fs-13">En livraison</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm text-center py-3">
+      <div class="fs-26 fw-bold text-warning">{{ countByStatus('En attente') }}</div>
+      <div class="text-muted fs-13">En attente</div>
+    </div>
+  </div>
+</div>
+
+<!-- Filters & Search -->
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-body">
+
+    <!-- Tab filters -->
+    <div class="d-flex flex-wrap gap-2 mb-3">
+      @for(tab of tabs; track $index){
+      <button type="button"
+              class="btn btn-sm rounded-pill px-3"
+              [class.btn-primary]="activeTab === tab"
+              [class.btn-outline-secondary]="activeTab !== tab"
+              (click)="activeTab = tab; selectedOrder = null">
+        {{ tab }}
+        <span class="badge ms-1"
+              [class.bg-light]="activeTab === tab"
+              [class.text-primary]="activeTab === tab"
+              [class.bg-secondary-subtle]="activeTab !== tab"
+              [class.text-muted]="activeTab !== tab">
+          {{ countByStatus(tab) }}
+        </span>
+      </button>
+      }
+    </div>
+
+    <!-- Search -->
+    <div class="position-relative" style="max-width:380px">
+      <i class="ri-search-line position-absolute top-50 translate-middle-y ms-3 text-muted fs-14"></i>
+      <input type="text" class="form-control ps-5 rounded-pill" placeholder="Rechercher une commande..."
+             [(ngModel)]="searchTerm" (ngModelChange)="selectedOrder = null">
+    </div>
+  </div>
+</div>
+
+<!-- Orders List -->
+@if(filteredOrders.length === 0){
+<div class="card border-0 shadow-sm">
+  <div class="card-body text-center py-5">
+    <i class="ri-inbox-2-line display-4 text-muted opacity-50"></i>
+    <p class="text-muted mt-3 fs-14">Aucune commande trouvée.</p>
+  </div>
+</div>
+}
+
+@for(order of filteredOrders; track $index){
+<div class="card border-0 shadow-sm mb-3 overflow-hidden">
+
+  <!-- Order Header -->
+  <div class="card-body">
+    <div class="row align-items-center">
+
+      <!-- Order ID + Date -->
+      <div class="col-md-3 mb-2 mb-md-0">
+        <div class="fw-bold text-primary fs-14">{{ order.id }}</div>
+        <div class="text-muted fs-12 mt-1">
+          <i class="ri-calendar-line me-1"></i>{{ order.date }}
+        </div>
+        <div class="text-muted fs-12 mt-1">
+          <i class="ri-store-2-line me-1"></i>{{ order.vendor }}
+        </div>
+      </div>
+
+      <!-- Items preview -->
+      <div class="col-md-4 mb-2 mb-md-0">
+        @for(item of order.items; track $index){
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <div class="rounded-2 d-flex align-items-center justify-content-center flex-shrink-0"
+               style="width:32px;height:32px;background:{{ item.bgColor }}">
+            <i class="ri-shopping-bag-2-line text-primary fs-14"></i>
+          </div>
+          <div>
+            <div class="fs-13 fw-medium text-dark">{{ item.name }}</div>
+            <div class="fs-11 text-muted">x{{ item.qty }} — {{ item.price }} TND</div>
+          </div>
+        </div>
+        }
+      </div>
+
+      <!-- Total -->
+      <div class="col-md-2 mb-2 mb-md-0 text-center">
+        <div class="fs-16 fw-bold text-dark">{{ order.total }} <small class="fs-12 text-muted">TND</small></div>
+        <div class="fs-11 text-muted mt-1">{{ order.payment }}</div>
+      </div>
+
+      <!-- Status -->
+      <div class="col-md-2 mb-2 mb-md-0 text-center">
+        <span class="{{ getStatusClass(order.status) }} rounded-pill px-3 py-1 fs-12">
+          {{ order.status }}
+        </span>
+      </div>
+
+      <!-- Action -->
+      <div class="col-md-1 text-end">
+        <button type="button" class="btn btn-sm btn-light rounded-circle"
+                (click)="toggleOrder(order)"
+                [title]="selectedOrder?.id === order.id ? 'Fermer' : 'Détails'">
+          <i class="ri-arrow-{{ selectedOrder?.id === order.id ? 'up' : 'down' }}-s-line fs-16"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order Detail (expandable) -->
+  @if(selectedOrder?.id === order.id){
+  <div class="border-top bg-light">
+    <div class="p-4">
+      <div class="row g-4">
+
+        <!-- Timeline -->
+        @if(order.status !== 'Annulée'){
+        <div class="col-md-7">
+          <h6 class="fw-semibold mb-3 fs-13 text-muted text-uppercase" style="letter-spacing:1px">
+            Suivi de commande
+          </h6>
+          <div class="d-flex align-items-start gap-0">
+            @for(step of getTimelineSteps(order.status); track $index){
+            <div class="d-flex flex-column align-items-center flex-fill">
+              <div class="rounded-circle d-flex align-items-center justify-content-center mb-2 fw-semibold"
+                   style="width:38px;height:38px;font-size:16px"
+                   [class.bg-success]="step.done"
+                   [class.text-white]="step.done"
+                   [class.bg-light]="!step.done"
+                   [class.text-muted]="!step.done"
+                   [class.border]="!step.done">
+                <i class="{{ step.icon }}"></i>
+              </div>
+              <div class="fs-11 text-center fw-medium"
+                   [class.text-success]="step.done"
+                   [class.text-muted]="!step.done">
+                {{ step.label }}
+              </div>
+            </div>
+            @if($index < 3){
+            <div class="flex-fill mt-2" style="height:2px;margin-top:19px !important"
+                 [class.bg-success]="step.done"
+                 [class.bg-light]="!step.done">
+            </div>
+            }
+            }
+          </div>
+        </div>
+        }
+        @if(order.status === 'Annulée'){
+        <div class="col-md-7">
+          <div class="alert alert-danger border-0 d-flex align-items-center gap-2 mb-0">
+            <i class="ri-close-circle-fill fs-18"></i>
+            <span class="fs-13">Cette commande a été annulée. Un remboursement sera traité sous 48h si vous avez déjà payé.</span>
+          </div>
+        </div>
+        }
+
+        <!-- Delivery Info -->
+        <div class="col-md-5">
+          <h6 class="fw-semibold mb-3 fs-13 text-muted text-uppercase" style="letter-spacing:1px">
+            Informations de livraison
+          </h6>
+          <div class="d-flex gap-2 mb-2">
+            <i class="ri-map-pin-line text-primary mt-1"></i>
+            <span class="fs-13 text-dark">{{ order.address }}</span>
+          </div>
+          <div class="d-flex gap-2">
+            <i class="ri-secure-payment-line text-success mt-1"></i>
+            <span class="fs-13 text-dark">{{ order.payment }}</span>
+          </div>
+
+          <!-- Article Total -->
+          <div class="mt-3 pt-3 border-top">
+            <div class="d-flex justify-content-between fs-13 text-muted mb-1">
+              <span>Sous-total</span>
+              <span>{{ getOrderTotal(order) }} TND</span>
+            </div>
+            <div class="d-flex justify-content-between fs-13 text-muted mb-1">
+              <span>Livraison</span>
+              <span class="text-success">Gratuite</span>
+            </div>
+            <div class="d-flex justify-content-between fw-bold fs-14 mt-2 pt-2 border-top">
+              <span>Total</span>
+              <span class="text-primary">{{ order.total }} TND</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+</div>
+}

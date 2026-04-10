@@ -1,0 +1,201 @@
+<app-breadcrumbs [title]="'Messages'" [breadcrumbItems]="breadCrumbItems"></app-breadcrumbs>
+
+<!-- ── KPI MESSAGES ───────────────────────────────────────────────────────── -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm text-center py-3" style="border-radius:14px">
+      <div class="mx-auto mb-2 d-flex align-items-center justify-content-center"
+           style="width:44px;height:44px;background:#405189;border-radius:12px">
+        <i class="ri-chat-3-line text-white fs-20"></i>
+      </div>
+      <h3 class="fw-bold mb-0">{{ conversations.length }}</h3>
+      <small class="text-muted">Conversations</small>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm text-center py-3" style="border-radius:14px">
+      <div class="mx-auto mb-2 d-flex align-items-center justify-content-center"
+           style="width:44px;height:44px;background:#f06548;border-radius:12px">
+        <i class="ri-mail-unread-line text-white fs-20"></i>
+      </div>
+      <h3 class="fw-bold mb-0 text-danger">{{ totalUnread }}</h3>
+      <small class="text-muted">Non lus</small>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm text-center py-3" style="border-radius:14px">
+      <div class="mx-auto mb-2 d-flex align-items-center justify-content-center"
+           style="width:44px;height:44px;background:#0ab39c;border-radius:12px">
+        <i class="ri-user-smile-line text-white fs-20"></i>
+      </div>
+      <h3 class="fw-bold mb-0 text-success">{{ conversations.length }}</h3>
+      <small class="text-muted">Clients actifs</small>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm text-center py-3" style="border-radius:14px">
+      <div class="mx-auto mb-2 d-flex align-items-center justify-content-center"
+           style="width:44px;height:44px;background:#f7b84b;border-radius:12px">
+        <i class="ri-time-line text-white fs-20"></i>
+      </div>
+      <h3 class="fw-bold mb-0 text-warning">&lt;2h</h3>
+      <small class="text-muted">Tps de réponse moy.</small>
+    </div>
+  </div>
+</div>
+
+<!-- ── INTERFACE CHAT ─────────────────────────────────────────────────────── -->
+<div class="chat-wrapper">
+
+  <!-- Liste des conversations -->
+  <div class="conv-list">
+    <div class="conv-search">
+      <div class="input-group">
+        <span class="input-group-text bg-light border-0">
+          <i class="ri-search-line text-muted fs-14"></i>
+        </span>
+        <input type="text" class="form-control bg-light border-0 fs-13"
+               placeholder="Rechercher une conversation..."
+               [(ngModel)]="searchTerm">
+      </div>
+    </div>
+
+    <div class="conv-items">
+      @if (filteredConversations.length === 0) {
+        <div class="text-center py-4 text-muted fs-13">Aucune conversation trouvée</div>
+      }
+      @for (conv of filteredConversations; track conv.id; let i = $index) {
+        <div class="conv-item" [class.active]="selectedConv?.id === conv.id"
+             (click)="selectConv(conv)">
+          <div class="d-flex align-items-center gap-3">
+            <div class="avatar" [style.background]="getAvatarColor(i)">
+              {{ conv.avatar }}
+            </div>
+            <div class="flex-grow-1 min-width-0">
+              <div class="d-flex align-items-center justify-content-between">
+                <span class="conv-name">{{ conv.clientName }}</span>
+                <span class="text-muted fs-11">{{ conv.lastTime }}</span>
+              </div>
+              <div class="d-flex align-items-center justify-content-between mt-1">
+                <span class="conv-preview">{{ conv.lastMessage }}</span>
+                @if (conv.unread > 0) {
+                  <span class="badge bg-primary rounded-pill ms-1" style="font-size:10px;min-width:18px">
+                    {{ conv.unread }}
+                  </span>
+                }
+              </div>
+              <div class="mt-1">
+                <span class="badge bg-primary-subtle text-primary fs-10">{{ conv.product }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Zone de chat -->
+  @if (selectedConv) {
+    <div class="chat-area">
+      <!-- Header -->
+      <div class="chat-header">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center justify-content-center fw-bold text-white fs-14"
+                 style="width:42px;height:42px;border-radius:12px;background:#405189;flex-shrink:0">
+              {{ selectedConv.avatar }}
+            </div>
+            <div>
+              <div class="fw-semibold fs-14">{{ selectedConv.clientName }}</div>
+              <div class="text-muted fs-12">
+                <i class="ri-circle-fill text-success" style="font-size:8px;vertical-align:middle"></i>
+                En ligne · {{ selectedConv.clientEmail }}
+              </div>
+            </div>
+          </div>
+          <div class="d-flex gap-2">
+            <span class="badge bg-primary-subtle text-primary fs-11">
+              <i class="ri-box-3-line me-1"></i>{{ selectedConv.product }}
+            </span>
+            <div ngbDropdown placement="bottom-end">
+              <button class="btn btn-sm btn-soft-secondary" ngbDropdownToggle>
+                <i class="ri-more-2-line"></i>
+              </button>
+              <div ngbDropdownMenu>
+                <button ngbDropdownItem><i class="ri-user-line me-2"></i>Voir le profil client</button>
+                <button ngbDropdownItem><i class="ri-file-list-line me-2"></i>Voir ses commandes</button>
+                <div class="dropdown-divider"></div>
+                <button ngbDropdownItem class="text-danger"><i class="ri-close-circle-line me-2"></i>Archiver</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div class="messages-container" #msgContainer>
+        @for (msg of selectedConv.messages; track msg.id) {
+          <div class="msg-bubble" [class.msg-vendor]="msg.from==='vendor'" [class.msg-client]="msg.from==='client'">
+            @if (msg.from === 'client') {
+              <div class="d-flex align-items-end gap-2">
+                <div class="d-flex align-items-center justify-content-center fw-bold text-white fs-11"
+                     style="width:28px;height:28px;border-radius:8px;background:#405189;flex-shrink:0;margin-bottom:4px">
+                  {{ selectedConv.avatar }}
+                </div>
+                <div>
+                  <div class="bubble">{{ msg.text }}</div>
+                  <div class="msg-time">{{ msg.time }}</div>
+                </div>
+              </div>
+            } @else {
+              <div>
+                <div class="bubble">{{ msg.text }}</div>
+                <div class="msg-time">
+                  {{ msg.time }}
+                  <i class="ri-check-double-line text-info ms-1"></i>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Input -->
+      <div class="chat-input">
+        <div class="d-flex align-items-end gap-2">
+          <div class="flex-grow-1">
+            <textarea class="form-control border-0 bg-light"
+                      rows="2"
+                      placeholder="Écrire un message... (Entrée pour envoyer)"
+                      [(ngModel)]="newMessage"
+                      (keydown)="onEnter($event)"
+                      style="resize:none;border-radius:12px;font-size:13.5px"></textarea>
+          </div>
+          <button class="btn btn-primary d-flex align-items-center justify-content-center"
+                  style="width:44px;height:44px;border-radius:12px;padding:0;flex-shrink:0"
+                  [disabled]="!newMessage.trim()"
+                  (click)="sendMessage()">
+            <i class="ri-send-plane-2-fill fs-18"></i>
+          </button>
+        </div>
+        <div class="d-flex gap-2 mt-2">
+          <button class="btn btn-soft-secondary btn-sm">
+            <i class="ri-attachment-line me-1"></i>Fichier
+          </button>
+          <button class="btn btn-soft-secondary btn-sm">
+            <i class="ri-image-line me-1"></i>Photo
+          </button>
+          <span class="text-muted fs-11 align-self-center ms-auto">
+            <i class="ri-secure-payment-line me-1"></i>Chiffrement de bout en bout
+          </span>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="empty-chat">
+      <i class="ri-chat-3-line" style="font-size:64px;opacity:0.2"></i>
+      <span class="fs-14">Sélectionnez une conversation</span>
+    </div>
+  }
+
+</div>

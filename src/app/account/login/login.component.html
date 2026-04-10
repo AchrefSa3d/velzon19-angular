@@ -1,0 +1,158 @@
+<div class="auth-page-wrapper pt-5">
+    <div class="auth-one-bg-position auth-one-bg" id="auth-particles">
+        <div class="bg-overlay"></div>
+        <div class="shape">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120">
+                <path d="M 0,36 C 144,53.6 432,123.2 720,124 C 1008,124.8 1296,56.8 1440,40L1440 140L0 140z"></path>
+            </svg>
+        </div>
+    </div>
+
+    <div class="auth-page-content">
+        <div class="container">
+            <!-- Logo -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="text-center mt-sm-5 mb-4 text-white-50">
+                        <a routerLink="/landing" class="d-inline-block">
+                            <span class="fw-bold fs-24 text-white" style="font-family:'Segoe UI',sans-serif;letter-spacing:1px">
+                                <i class="ri-shopping-bag-3-fill me-2" style="color:#0ab39c"></i>Tijara
+                            </span>
+                        </a>
+                        <p class="mt-2 fs-14 fw-medium opacity-75">La marketplace tunisienne intelligente</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6 col-xl-5">
+
+                    <!-- Login Card -->
+                    <div class="card mt-4 border-0 shadow-lg">
+                        <div class="card-body p-4 p-sm-5">
+                            <div class="text-center mb-4">
+                                <div class="avatar-lg rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                                     style="background:linear-gradient(135deg,#405189,#0ab39c)">
+                                    <i class="ri-user-3-line fs-24 text-white"></i>
+                                </div>
+                                <h5 class="fw-bold text-dark">Bienvenue sur Tijara !</h5>
+                                <p class="text-muted fs-13">Connectez-vous à votre espace.</p>
+                            </div>
+
+                            @if(error){
+                            <div class="alert alert-danger border-0 d-flex align-items-center gap-2 py-2 fs-13">
+                                <i class="ri-error-warning-line fs-16 flex-shrink-0"></i>
+                                {{ error }}
+                            </div>
+                            }
+
+                            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-medium fs-13">Adresse e-mail</label>
+                                    <div class="position-relative">
+                                        <i class="ri-mail-line position-absolute top-50 translate-middle-y ms-3 text-muted fs-15"></i>
+                                        <input type="email" class="form-control ps-5" placeholder="exemple@tijara.tn"
+                                               formControlName="email"
+                                               [ngClass]="{'is-invalid': submitted && f['email'].errors}">
+                                    </div>
+                                    @if(submitted && f['email'].errors){
+                                    <div class="invalid-feedback d-block fs-12">
+                                        @if(f['email'].errors['required']){ <span>L'email est requis.</span> }
+                                        @if(f['email'].errors['email']){ <span>Format d'email invalide.</span> }
+                                    </div>
+                                    }
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <label class="form-label fw-medium fs-13">Mot de passe</label>
+                                        <a routerLink="/auth/pass-reset/basic" class="text-muted fs-12">Mot de passe oublié ?</a>
+                                    </div>
+                                    <div class="position-relative">
+                                        <i class="ri-lock-line position-absolute top-50 translate-middle-y ms-3 text-muted fs-15"></i>
+                                        <input [type]="fieldTextType ? 'text' : 'password'"
+                                               class="form-control ps-5 pe-5"
+                                               placeholder="••••••••"
+                                               formControlName="password"
+                                               [ngClass]="{'is-invalid': submitted && f['password'].errors}">
+                                        <button type="button"
+                                                class="btn btn-link position-absolute end-0 top-50 translate-middle-y pe-3 text-muted"
+                                                (click)="toggleFieldTextType()">
+                                            <i class="fs-15" [ngClass]="fieldTextType ? 'ri-eye-off-line' : 'ri-eye-line'"></i>
+                                        </button>
+                                    </div>
+                                    @if(submitted && f['password'].errors){
+                                    <div class="invalid-feedback d-block fs-12">Le mot de passe est requis.</div>
+                                    }
+                                </div>
+
+                                <div class="mt-4">
+                                    <button class="btn btn-primary w-100 fw-semibold py-2" type="submit" [disabled]="loading"
+                                            style="background:linear-gradient(135deg,#405189,#0ab39c);border:none">
+                                        @if(loading){
+                                        <span class="spinner-border spinner-border-sm me-2"></span>
+                                        }
+                                        Se connecter
+                                    </button>
+                                </div>
+                            </form>
+
+                            <!-- Demo accounts -->
+                            <div class="mt-4 pt-3 border-top">
+                                <p class="text-center text-muted fs-12 mb-2">
+                                    <i class="ri-information-line me-1"></i>Comptes de démonstration — cliquez pour remplir
+                                </p>
+                                <div class="d-flex flex-column gap-2">
+                                    @for(u of demoUsers; track $index){
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-2 text-start px-3"
+                                            (click)="fillDemo(u)">
+                                        <span class="avatar-xs rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                              [class.bg-danger-subtle]="u.role==='admin'"
+                                              [class.bg-success-subtle]="u.role==='vendor'"
+                                              [class.bg-primary-subtle]="u.role==='user'">
+                                            <i class="fs-12"
+                                               [class.ri-shield-user-line]="u.role==='admin'"
+                                               [class.text-danger]="u.role==='admin'"
+                                               [class.ri-store-2-line]="u.role==='vendor'"
+                                               [class.text-success]="u.role==='vendor'"
+                                               [class.ri-user-line]="u.role==='user'"
+                                               [class.text-primary]="u.role==='user'"></i>
+                                        </span>
+                                        <div class="flex-fill">
+                                            <div class="fs-12 fw-semibold text-dark">
+                                                {{ u.role === 'admin' ? 'Administrateur' : u.role === 'vendor' ? 'Vendeur' : 'Utilisateur' }}
+                                            </div>
+                                            <div class="fs-11 text-muted">{{ u.email }} / <strong>{{ u.password }}</strong></div>
+                                        </div>
+                                        <i class="ri-arrow-right-s-line text-muted"></i>
+                                    </button>
+                                    }
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <p class="text-white-50 fs-13">
+                            Pas encore de compte ?
+                            <a routerLink="/auth/register" class="fw-semibold text-white">S'inscrire</a>
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="text-center">
+                <p class="mb-0 text-muted">&copy; {{year}} Tijara. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+</div>
+<app-toasts aria-live="polite" aria-atomic="true"></app-toasts>

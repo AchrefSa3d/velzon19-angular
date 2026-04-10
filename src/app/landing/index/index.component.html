@@ -1,0 +1,561 @@
+<div appScrollspy [spiedTags]="['SECTION']" (sectionChange)="onSectionChange($event)">
+<div class="layout-wrapper landing">
+
+  <!-- ════════════════════════════════════════════════════════════
+       NAVBAR
+  ════════════════════════════════════════════════════════════ -->
+  <nav class="navbar navbar-expand-lg navbar-landing fixed-top" id="navbar" (window:scroll)="windowScroll()">
+    <div class="container">
+      <!-- Logo Tijara -->
+      <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/landing">
+        <div class="tijara-logo-nav d-flex align-items-center gap-1">
+          <div style="width:34px;height:34px;background:linear-gradient(135deg,#405189,#0ab39c);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+            <i class="ri-shopping-bag-3-fill text-white fs-18"></i>
+          </div>
+          <span class="fw-bold fs-20" style="color:#405189;letter-spacing:0.5px;font-family:'Segoe UI',sans-serif">Tijara</span>
+        </div>
+      </a>
+
+      <button class="navbar-toggler py-0 fs-20 text-body" type="button" (click)="toggleMenu()">
+        <i class="mdi mdi-menu"></i>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mx-auto mt-2 mt-lg-0" id="navbar-example">
+          <li class="nav-item">
+            <a class="nav-link" [ngClass]="{'active': currentSection==='hero'}"       [ngxScrollTo]="'#hero'"       href="javascript:void(0);">Accueil</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" [ngClass]="{'active': currentSection==='categories'}" [ngxScrollTo]="'#categories'" href="javascript:void(0);">Catégories</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" [ngClass]="{'active': currentSection==='products'}"   [ngxScrollTo]="'#products'"   href="javascript:void(0);">Produits</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" [ngClass]="{'active': currentSection==='how'}"        [ngxScrollTo]="'#how'"        href="javascript:void(0);">Comment ça marche</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" [ngClass]="{'active': currentSection==='reviews'}"    [ngxScrollTo]="'#reviews'"    href="javascript:void(0);">Témoignages</a>
+          </li>
+        </ul>
+        <div class="d-flex gap-2">
+          <a routerLink="/auth/login"    class="btn btn-ghost-secondary fw-medium">Se connecter</a>
+          <a routerLink="/auth/register" class="btn btn-primary fw-medium">
+            <i class="ri-user-add-line me-1"></i>S'inscrire
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ════════════════════════════════════════════════════════════
+       HERO
+  ════════════════════════════════════════════════════════════ -->
+  <section class="section pb-0 hero-section" id="hero" style="background:linear-gradient(135deg,#1a2d6e 0%,#405189 45%,#0a7d6e 100%)">
+    <div class="container" style="padding-top:90px">
+      <div class="row align-items-center gy-5">
+        <div class="col-lg-6">
+          <!-- Badge tendance -->
+          <div class="d-inline-flex align-items-center gap-2 rounded-pill px-3 py-1 mb-3"
+               style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2)">
+            <span class="badge bg-success rounded-pill">Nouveau</span>
+            <span class="text-white fs-13">+500 produits ajoutés cette semaine</span>
+          </div>
+
+          <h1 class="display-4 fw-bold text-white lh-sm mb-3">
+            La marketplace<br>
+            <span style="background:linear-gradient(90deg,#f7b84b,#0ab39c);-webkit-background-clip:text;-webkit-text-fill-color:transparent">
+              #1 en Tunisie
+            </span>
+          </h1>
+          <p class="text-white fs-16 mb-4" style="opacity:0.8;line-height:1.7">
+            Achetez, vendez et échangez en toute confiance.<br>
+            Des milliers de produits, des vendeurs vérifiés, livrés partout en Tunisie.
+          </p>
+
+          <!-- Boutons CTA -->
+          <div class="d-flex gap-3 flex-wrap mb-5">
+            <a routerLink="/auth/register" class="btn btn-warning btn-lg fw-semibold px-4 shadow">
+              <i class="ri-shopping-bag-3-line me-2"></i>Commencer à acheter
+            </a>
+            <a routerLink="/auth/register" class="btn btn-outline-light btn-lg fw-medium px-4">
+              <i class="ri-store-2-line me-2"></i>Devenir vendeur
+            </a>
+          </div>
+
+          <!-- Mini stats -->
+          <div class="row g-3">
+            @for (stat of stats; track stat.label) {
+              <div class="col-6">
+                <div class="d-flex align-items-center gap-3"
+                     style="background:rgba(255,255,255,0.08);border-radius:12px;padding:12px 16px;border:1px solid rgba(255,255,255,0.12)">
+                  <div style="width:38px;height:38px;background:rgba(255,255,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center">
+                    <i class="{{ stat.icon }} text-warning fs-18"></i>
+                  </div>
+                  <div>
+                    <div class="fw-bold text-white fs-16">{{ stat.value }}</div>
+                    <div class="fs-12" style="color:rgba(255,255,255,0.6)">{{ stat.label }}</div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Carte produit flottante à droite -->
+        <div class="col-lg-6 d-none d-lg-block">
+          <div class="position-relative" style="padding:20px">
+
+            <!-- Carte principale -->
+            <div class="card border-0 shadow-lg" style="border-radius:20px;overflow:hidden">
+              <div style="height:220px;background:linear-gradient(135deg,#405189,#0ab39c);position:relative;display:flex;align-items:center;justify-content:center">
+                <i class="ri-shopping-bag-3-fill" style="font-size:80px;color:rgba(255,255,255,0.2)"></i>
+                <div class="position-absolute top-0 start-0 m-3">
+                  <span class="badge bg-danger fs-12">-25%</span>
+                </div>
+                <div class="position-absolute bottom-0 start-0 m-3 text-white">
+                  <div class="fs-12 opacity-75">Électronique</div>
+                  <div class="fw-bold fs-16">iPhone 14 Pro</div>
+                  <div class="fw-bold fs-20 text-warning">1 200 DT</div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  @for (star of getStars(5); track $index) {
+                    <i class="ri-star-fill text-warning"></i>
+                  }
+                  <span class="text-muted fs-12">(124 avis)</span>
+                </div>
+                <div class="d-flex align-items-center justify-content-between">
+                  <div class="d-flex align-items-center gap-2">
+                    <div style="width:28px;height:28px;background:#405189;border-radius:50%;display:flex;align-items:center;justify-content:center">
+                      <i class="ri-store-2-fill text-white" style="font-size:12px"></i>
+                    </div>
+                    <span class="text-muted fs-13">TechTunis</span>
+                  </div>
+                  <span class="badge bg-success-subtle text-success">En stock</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Badge flottant 1 -->
+            <div class="position-absolute top-0 end-0"
+                 style="background:white;border-radius:16px;padding:10px 14px;box-shadow:0 8px 24px rgba(0,0,0,0.15)">
+              <div class="d-flex align-items-center gap-2">
+                <div style="width:32px;height:32px;background:#0ab39c20;border-radius:8px;display:flex;align-items:center;justify-content:center">
+                  <i class="ri-shield-check-fill text-success fs-16"></i>
+                </div>
+                <div>
+                  <div class="fw-bold fs-13">Paiement sécurisé</div>
+                  <div class="text-muted fs-11">100% protégé</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Badge flottant 2 -->
+            <div class="position-absolute bottom-0 start-0"
+                 style="background:white;border-radius:16px;padding:10px 14px;box-shadow:0 8px 24px rgba(0,0,0,0.15)">
+              <div class="d-flex align-items-center gap-2">
+                <div style="width:32px;height:32px;background:#405189;border-radius:8px;display:flex;align-items:center;justify-content:center">
+                  <i class="ri-truck-line text-white fs-16"></i>
+                </div>
+                <div>
+                  <div class="fw-bold fs-13">Livraison rapide</div>
+                  <div class="text-muted fs-11">Partout en Tunisie</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vague de séparation -->
+    <div class="position-relative mt-5" style="height:80px;overflow:hidden">
+      <svg viewBox="0 0 1440 80" preserveAspectRatio="none" style="position:absolute;bottom:0;width:100%;height:100%">
+        <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#ffffff"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       BARRE DE CONFIANCE
+  ════════════════════════════════════════════════════════════ -->
+  <section class="py-4 bg-white border-bottom">
+    <div class="container">
+      <div class="row g-3 text-center">
+        <div class="col-6 col-md-3">
+          <div class="d-flex align-items-center justify-content-center gap-2">
+            <i class="ri-shield-check-line fs-24 text-success"></i>
+            <div class="text-start">
+              <div class="fw-semibold fs-14">Vendeurs vérifiés</div>
+              <div class="text-muted fs-12">Chaque boutique est contrôlée</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="d-flex align-items-center justify-content-center gap-2">
+            <i class="ri-truck-line fs-24 text-primary"></i>
+            <div class="text-start">
+              <div class="fw-semibold fs-14">Livraison nationale</div>
+              <div class="text-muted fs-12">24 gouvernorats couverts</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="d-flex align-items-center justify-content-center gap-2">
+            <i class="ri-customer-service-2-line fs-24 text-warning"></i>
+            <div class="text-start">
+              <div class="fw-semibold fs-14">Support 7j/7</div>
+              <div class="text-muted fs-12">Réponse en moins de 2h</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="d-flex align-items-center justify-content-center gap-2">
+            <i class="ri-refund-2-line fs-24 text-danger"></i>
+            <div class="text-start">
+              <div class="fw-semibold fs-14">Retour facile</div>
+              <div class="text-muted fs-12">Sous 7 jours garanti</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       CATÉGORIES
+  ════════════════════════════════════════════════════════════ -->
+  <section class="py-5" id="categories">
+    <div class="container">
+      <div class="text-center mb-5">
+        <span class="badge bg-primary-subtle text-primary fw-semibold px-3 py-2 rounded-pill fs-13 mb-2">Explorer par catégorie</span>
+        <h2 class="fw-bold fs-28 mt-2">Toutes les catégories</h2>
+        <p class="text-muted">Parcourez nos catégories et trouvez exactement ce que vous cherchez</p>
+      </div>
+      <div class="row g-3">
+        @for (cat of categories; track cat.name) {
+          <div class="col-6 col-md-3">
+            <a routerLink="/auth/login" class="text-decoration-none">
+              <div class="card border h-100 text-center p-3"
+                   style="border-radius:16px;transition:all 0.25s ease;cursor:pointer"
+                   onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(64,81,137,0.15)'"
+                   onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
+                <div class="card-body py-2">
+                  <div class="mx-auto mb-3 d-flex align-items-center justify-content-center"
+                       style="width:56px;height:56px;border-radius:16px"
+                       class="bg-{{ cat.color }}-subtle">
+                    <i class="{{ cat.icon }} fs-26 text-{{ cat.color }}"></i>
+                  </div>
+                  <h6 class="mb-1 text-body fw-semibold fs-14">{{ cat.name }}</h6>
+                  <span class="badge bg-light text-muted fs-11">{{ cat.count }} annonces</span>
+                </div>
+              </div>
+            </a>
+          </div>
+        }
+      </div>
+      <div class="text-center mt-4">
+        <a routerLink="/auth/login" class="btn btn-outline-primary rounded-pill px-4">
+          Voir toutes les catégories <i class="ri-arrow-right-line ms-1"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       PRODUITS VEDETTES
+  ════════════════════════════════════════════════════════════ -->
+  <section class="py-5" style="background:#f8f9fc" id="products">
+    <div class="container">
+      <div class="d-flex align-items-end justify-content-between mb-5 flex-wrap gap-3">
+        <div>
+          <span class="badge bg-warning-subtle text-warning fw-semibold px-3 py-2 rounded-pill fs-13 mb-2">Sélection du moment</span>
+          <h2 class="fw-bold fs-28 mt-2 mb-1">Produits populaires</h2>
+          <p class="text-muted mb-0">Les meilleures offres du jour sélectionnées pour vous</p>
+        </div>
+        <a routerLink="/auth/login" class="btn btn-primary rounded-pill px-4">
+          Voir tout <i class="ri-arrow-right-line ms-1"></i>
+        </a>
+      </div>
+
+      <div class="row g-4">
+        @for (product of featuredProducts; track product.id) {
+          <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm" style="border-radius:16px;overflow:hidden;transition:transform 0.2s"
+                 onmouseover="this.style.transform='translateY(-4px)'"
+                 onmouseout="this.style.transform='translateY(0)'">
+              <!-- Visuel produit -->
+              <div class="position-relative" style="height:200px;background:{{ product.bgColor }}20">
+                <div class="d-flex align-items-center justify-content-center h-100">
+                  <i class="ri-shopping-bag-3-line" style="font-size:64px;color:{{ product.bgColor }};opacity:0.4"></i>
+                </div>
+                @if (product.badge) {
+                  <span class="position-absolute top-0 start-0 m-2 badge"
+                        [style.background]="product.bgColor">{{ product.badge }}</span>
+                }
+                <button class="position-absolute top-0 end-0 m-2 btn btn-sm btn-white rounded-circle shadow-sm"
+                        style="width:34px;height:34px;padding:0;border:none;background:white">
+                  <i class="ri-heart-line text-danger"></i>
+                </button>
+              </div>
+
+              <div class="card-body pb-0">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                  <span class="badge bg-light text-muted fs-11">{{ product.category }}</span>
+                  <div class="d-flex align-items-center gap-1">
+                    <i class="ri-star-fill text-warning fs-12"></i>
+                    <span class="fw-semibold fs-12">{{ product.rating }}</span>
+                    <span class="text-muted fs-11">({{ product.reviews }})</span>
+                  </div>
+                </div>
+                <h6 class="fw-semibold fs-15 mb-2">{{ product.name }}</h6>
+                <div class="d-flex align-items-center justify-content-between">
+                  <div>
+                    <span class="fw-bold fs-17" [style.color]="product.bgColor">{{ product.price | number }} DT</span>
+                    @if (product.oldPrice) {
+                      <span class="text-muted text-decoration-line-through fs-12 ms-2">{{ product.oldPrice | number }} DT</span>
+                    }
+                  </div>
+                  <span class="text-muted fs-12"><i class="ri-store-2-line me-1"></i>{{ product.seller }}</span>
+                </div>
+              </div>
+
+              <div class="card-footer bg-transparent border-0 pt-2">
+                <a routerLink="/auth/login" class="btn btn-primary w-100 rounded-pill btn-sm fw-medium">
+                  <i class="ri-shopping-cart-2-line me-1"></i>Ajouter au panier
+                </a>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       COMMENT ÇA MARCHE
+  ════════════════════════════════════════════════════════════ -->
+  <section class="py-5 bg-white" id="how">
+    <div class="container">
+      <div class="text-center mb-5">
+        <span class="badge bg-info-subtle text-info fw-semibold px-3 py-2 rounded-pill fs-13 mb-2">Simple & Rapide</span>
+        <h2 class="fw-bold fs-28 mt-2">Comment ça marche ?</h2>
+        <p class="text-muted">Achetez ou vendez en 3 étapes simples</p>
+      </div>
+      <div class="row g-4 align-items-center">
+        @for (step of steps; track step.step) {
+          <div class="col-md-4">
+            <div class="text-center position-relative">
+              <!-- Numéro de fond -->
+              <div style="font-size:80px;font-weight:900;color:#f0f2f9;line-height:1;margin-bottom:-20px;font-family:'Segoe UI',sans-serif">
+                {{ step.step }}
+              </div>
+              <!-- Icône -->
+              <div class="mx-auto mb-4 d-flex align-items-center justify-content-center"
+                   style="width:72px;height:72px;background:linear-gradient(135deg,#405189,#0ab39c);border-radius:20px;box-shadow:0 8px 24px rgba(64,81,137,0.25)">
+                <i class="{{ step.icon }} text-white fs-28"></i>
+              </div>
+              <h5 class="fw-bold mb-2">{{ step.title }}</h5>
+              <p class="text-muted fs-14 mb-0">{{ step.desc }}</p>
+            </div>
+          </div>
+        }
+      </div>
+      <div class="text-center mt-5">
+        <a routerLink="/auth/register" class="btn btn-primary btn-lg rounded-pill px-5 shadow">
+          <i class="ri-rocket-line me-2"></i>Démarrer maintenant
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       TÉMOIGNAGES
+  ════════════════════════════════════════════════════════════ -->
+  <section class="py-5" style="background:#f8f9fc" id="reviews">
+    <div class="container">
+      <div class="text-center mb-5">
+        <span class="badge bg-success-subtle text-success fw-semibold px-3 py-2 rounded-pill fs-13 mb-2">Ils nous font confiance</span>
+        <h2 class="fw-bold fs-28 mt-2">Ce que disent nos membres</h2>
+        <p class="text-muted">Plus de 45 000 Tunisiens utilisent Tijara chaque mois</p>
+      </div>
+      <div class="row g-4">
+        @for (t of testimonials; track t.name) {
+          <div class="col-md-4">
+            <div class="card border-0 h-100" style="border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.06)">
+              <div class="card-body p-4">
+                <!-- Quote icon -->
+                <div class="mb-3" style="font-size:32px;color:#405189;opacity:0.2;line-height:1">"</div>
+                <div class="d-flex gap-1 mb-3">
+                  @for (star of getStars(t.rating); track $index) {
+                    <i class="ri-star-fill text-warning fs-14"></i>
+                  }
+                </div>
+                <p class="text-muted fs-14 mb-4 lh-base">{{ t.text }}</p>
+                <div class="d-flex align-items-center gap-3 pt-3 border-top">
+                  <div class="d-flex align-items-center justify-content-center fw-bold text-white fs-16"
+                       style="width:44px;height:44px;background:linear-gradient(135deg,#405189,#0ab39c);border-radius:12px">
+                    {{ t.name.charAt(0) }}
+                  </div>
+                  <div>
+                    <div class="fw-semibold fs-14">{{ t.name }}</div>
+                    <div class="text-muted fs-12">{{ t.role }} — Tijara</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       CTA — DEVENIR VENDEUR
+  ════════════════════════════════════════════════════════════ -->
+  <section class="py-5" style="background:linear-gradient(135deg,#405189 0%,#1a2d6e 100%)">
+    <div class="container">
+      <div class="row align-items-center gy-4 justify-content-between">
+        <div class="col-lg-7">
+          <div class="d-inline-flex align-items-center gap-2 rounded-pill px-3 py-1 mb-3"
+               style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2)">
+            <i class="ri-store-2-fill text-warning"></i>
+            <span class="text-white fs-13 fw-medium">Rejoignez 3 200+ vendeurs actifs</span>
+          </div>
+          <h2 class="text-white fw-bold fs-28 mb-3">
+            Ouvrez votre boutique<br>
+            <span class="text-warning">gratuitement sur Tijara</span>
+          </h2>
+          <p class="mb-0 fs-15" style="color:rgba(255,255,255,0.75)">
+            Publiez vos annonces, gérez vos commandes et développez votre activité partout en Tunisie. Dashboard vendeur inclus.
+          </p>
+          <div class="d-flex gap-3 mt-4 flex-wrap">
+            <div class="d-flex align-items-center gap-2 text-white">
+              <i class="ri-check-line text-success fs-16"></i>
+              <span class="fs-14">Inscription gratuite</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 text-white">
+              <i class="ri-check-line text-success fs-16"></i>
+              <span class="fs-14">Commission minimale</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 text-white">
+              <i class="ri-check-line text-success fs-16"></i>
+              <span class="fs-14">Dashboard analytique</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+          <a routerLink="/auth/register"
+             class="btn btn-warning btn-lg fw-bold px-5 py-3 shadow-lg"
+             style="border-radius:14px;font-size:1.05rem">
+            <i class="ri-store-2-line me-2"></i>Ouvrir ma boutique
+          </a>
+          <div class="mt-3 text-center">
+            <span class="fs-13" style="color:rgba(255,255,255,0.5)">Déjà vendeur ?</span>
+            <a routerLink="/auth/login" class="text-warning fs-13 ms-1 fw-medium text-decoration-none">Se connecter</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       FOOTER
+  ════════════════════════════════════════════════════════════ -->
+  <footer style="background:#0f1c3f;padding:60px 0 0">
+    <div class="container">
+      <div class="row g-4 pb-5">
+        <!-- Brand -->
+        <div class="col-lg-4">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <div style="width:38px;height:38px;background:linear-gradient(135deg,#405189,#0ab39c);border-radius:10px;display:flex;align-items:center;justify-content:center">
+              <i class="ri-shopping-bag-3-fill text-white fs-18"></i>
+            </div>
+            <span class="fw-bold fs-20 text-white" style="letter-spacing:0.5px">Tijara</span>
+          </div>
+          <p style="color:rgba(255,255,255,0.5);font-size:14px;line-height:1.7">
+            La marketplace intelligente qui connecte acheteurs et vendeurs tunisiens en toute simplicité et sécurité.
+          </p>
+          <div class="d-flex gap-2 mt-4">
+            <a href="javascript:void(0)" style="width:36px;height:36px;background:rgba(255,255,255,0.08);border-radius:8px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.6);text-decoration:none"
+               onmouseover="this.style.background='#405189';this.style.color='white'"
+               onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.6)'">
+              <i class="ri-facebook-fill"></i>
+            </a>
+            <a href="javascript:void(0)" style="width:36px;height:36px;background:rgba(255,255,255,0.08);border-radius:8px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.6);text-decoration:none"
+               onmouseover="this.style.background='#e1306c';this.style.color='white'"
+               onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.6)'">
+              <i class="ri-instagram-line"></i>
+            </a>
+            <a href="javascript:void(0)" style="width:36px;height:36px;background:rgba(255,255,255,0.08);border-radius:8px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.6);text-decoration:none"
+               onmouseover="this.style.background='#0077b5';this.style.color='white'"
+               onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.6)'">
+              <i class="ri-linkedin-fill"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Liens -->
+        <div class="col-6 col-lg-2">
+          <h6 class="text-white fw-semibold mb-4 fs-14 text-uppercase" style="letter-spacing:1px">Plateforme</h6>
+          <ul class="list-unstyled" style="color:rgba(255,255,255,0.5);font-size:14px">
+            <li class="mb-2"><a routerLink="/landing"       style="color:rgba(255,255,255,0.5);text-decoration:none" onmouseover="this.style.color='#0ab39c'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Accueil</a></li>
+            <li class="mb-2"><a routerLink="/auth/login"    style="color:rgba(255,255,255,0.5);text-decoration:none" onmouseover="this.style.color='#0ab39c'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Parcourir la boutique</a></li>
+            <li class="mb-2"><a routerLink="/auth/register" style="color:rgba(255,255,255,0.5);text-decoration:none" onmouseover="this.style.color='#0ab39c'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Devenir vendeur</a></li>
+            <li class="mb-2"><a routerLink="/auth/login"    style="color:rgba(255,255,255,0.5);text-decoration:none" onmouseover="this.style.color='#0ab39c'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Mon compte</a></li>
+          </ul>
+        </div>
+
+        <div class="col-6 col-lg-2">
+          <h6 class="text-white fw-semibold mb-4 fs-14 text-uppercase" style="letter-spacing:1px">Support</h6>
+          <ul class="list-unstyled" style="color:rgba(255,255,255,0.5);font-size:14px">
+            <li class="mb-2"><a href="javascript:void(0)" style="color:rgba(255,255,255,0.5);text-decoration:none" onmouseover="this.style.color='#0ab39c'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Centre d'aide</a></li>
+            <li class="mb-2"><a href="javascript:void(0)" style="color:rgba(255,255,255,0.5);text-decoration:none" onmouseover="this.style.color='#0ab39c'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Contactez-nous</a></li>
+            <li class="mb-2"><a href="javascript:void(0)" style="color:rgba(255,255,255,0.5);text-decoration:none" onmouseover="this.style.color='#0ab39c'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Signaler un problème</a></li>
+            <li class="mb-2"><a href="javascript:void(0)" style="color:rgba(255,255,255,0.5);text-decoration:none" onmouseover="this.style.color='#0ab39c'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Politique de retour</a></li>
+          </ul>
+        </div>
+
+        <!-- Newsletter -->
+        <div class="col-lg-4">
+          <h6 class="text-white fw-semibold mb-4 fs-14 text-uppercase" style="letter-spacing:1px">Restez informé</h6>
+          <p style="color:rgba(255,255,255,0.5);font-size:14px">Recevez les meilleures offres et nouveautés directement dans votre boîte mail.</p>
+          <div class="input-group mt-3" style="background:rgba(255,255,255,0.06);border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.1)">
+            <input type="email" class="form-control border-0 text-white"
+                   style="background:transparent;color:white"
+                   placeholder="votre@email.com">
+            <button class="btn btn-primary px-3" type="button">
+              <i class="ri-send-plane-2-line"></i>
+            </button>
+          </div>
+          <p class="mt-2" style="color:rgba(255,255,255,0.3);font-size:12px">
+            <i class="ri-lock-line me-1"></i>Pas de spam. Désinscription en un clic.
+          </p>
+        </div>
+      </div>
+
+      <!-- Bottom bar -->
+      <div style="border-top:1px solid rgba(255,255,255,0.08);padding:20px 0">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+          <p class="mb-0" style="color:rgba(255,255,255,0.35);font-size:13px">
+            &copy; {{ year }} Tijara. Tous droits réservés — Marketplace Tunisienne
+          </p>
+          <div class="d-flex gap-3">
+            <a href="javascript:void(0)" style="color:rgba(255,255,255,0.35);font-size:13px;text-decoration:none">Conditions d'utilisation</a>
+            <a href="javascript:void(0)" style="color:rgba(255,255,255,0.35);font-size:13px;text-decoration:none">Confidentialité</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Back to top -->
+  <button (click)="topFunction()" class="btn btn-primary btn-icon landing-back-top" id="back-to-top"
+          style="display:none;border-radius:12px;box-shadow:0 4px 16px rgba(64,81,137,0.4)">
+    <i class="ri-arrow-up-line"></i>
+  </button>
+
+</div>
+</div>

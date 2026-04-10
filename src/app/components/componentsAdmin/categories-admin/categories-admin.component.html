@@ -1,0 +1,96 @@
+<app-breadcrumbs [title]="'Gestion Catégories'" [breadcrumbItems]="breadCrumbItems"></app-breadcrumbs>
+
+<!-- Toolbar -->
+<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+  <div>
+    <span class="text-muted small">{{ categories.length }} catégories au total</span>
+  </div>
+  <button class="btn btn-primary" (click)="openAdd()">
+    <i class="ri-add-line me-1"></i>Ajouter une catégorie
+  </button>
+</div>
+
+<!-- Formulaire inline -->
+@if (showForm) {
+  <div class="card border-primary shadow-sm mb-4">
+    <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
+      <h6 class="mb-0 text-white">
+        <i class="ri-{{ editingId ? 'edit' : 'add' }}-line me-1"></i>
+        {{ editingId ? 'Modifier la catégorie' : 'Nouvelle catégorie' }}
+      </h6>
+      <button class="btn btn-sm btn-link text-white p-0" (click)="cancel()">
+        <i class="ri-close-line fs-18"></i>
+      </button>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Nom <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" formControlName="name"
+                   [class.is-invalid]="submitted && f['name'].errors">
+            @if (submitted && f['name'].errors) {
+              <div class="invalid-feedback">Nom requis (min 2 car.)</div>
+            }
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Icône</label>
+            <select class="form-select" formControlName="icon">
+              @for (ic of iconOptions; track ic) {
+                <option [value]="ic">{{ ic }}</option>
+              }
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label fw-semibold">Couleur</label>
+            <select class="form-select" formControlName="color">
+              @for (col of colorOptions; track col) {
+                <option [value]="col">{{ col }}</option>
+              }
+            </select>
+          </div>
+          <div class="col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-primary flex-grow-1">
+              <i class="ri-save-line me-1"></i>Enregistrer
+            </button>
+            <button type="button" class="btn btn-light" (click)="cancel()">Annuler</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Grille catégories -->
+<div class="row g-3">
+  @for (cat of categories; track cat.id) {
+    <div class="col-6 col-md-4 col-xl-3">
+      <div class="card border-0 shadow-sm h-100" [class.opacity-50]="!cat.active">
+        <div class="card-body text-center py-4">
+          <div class="mx-auto mb-3 rounded-circle bg-{{ cat.color }}-subtle d-flex align-items-center justify-content-center"
+               style="width:56px;height:56px">
+            <i class="{{ cat.icon }} fs-24 text-{{ cat.color }}"></i>
+          </div>
+          <h6 class="fw-bold mb-1">{{ cat.name }}</h6>
+          <p class="text-muted small mb-2">{{ cat.products }} produits</p>
+          <span class="badge {{ cat.active ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary' }} mb-3">
+            {{ cat.active ? 'Active' : 'Inactive' }}
+          </span>
+          <div class="d-flex gap-2 justify-content-center">
+            <button class="btn btn-sm btn-soft-primary" (click)="openEdit(cat)" ngbTooltip="Modifier">
+              <i class="ri-edit-line"></i>
+            </button>
+            <button class="btn btn-sm {{ cat.active ? 'btn-soft-warning' : 'btn-soft-success' }}"
+                    (click)="toggleActive(cat)"
+                    [ngbTooltip]="cat.active ? 'Désactiver' : 'Activer'">
+              <i class="ri-{{ cat.active ? 'eye-off' : 'eye' }}-line"></i>
+            </button>
+            <button class="btn btn-sm btn-soft-danger" (click)="delete(cat)" ngbTooltip="Supprimer">
+              <i class="ri-delete-bin-line"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

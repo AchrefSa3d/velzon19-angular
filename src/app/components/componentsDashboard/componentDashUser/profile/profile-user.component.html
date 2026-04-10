@@ -1,0 +1,306 @@
+<app-breadcrumbs title="Mon Profil" [breadcrumbItems]="breadcrumbItems"></app-breadcrumbs>
+
+<!-- Alerts -->
+@if(saveSuccess){
+<div class="alert alert-success border-0 shadow-sm d-flex align-items-center gap-2 mb-4">
+  <i class="ri-checkbox-circle-fill fs-18"></i>
+  <span class="fs-14">Votre profil a été mis à jour avec succès.</span>
+</div>
+}
+@if(pwdSuccess){
+<div class="alert alert-success border-0 shadow-sm d-flex align-items-center gap-2 mb-4">
+  <i class="ri-shield-check-fill fs-18"></i>
+  <span class="fs-14">Mot de passe modifié avec succès.</span>
+</div>
+}
+
+<div class="row g-4">
+
+  <!-- LEFT: Avatar + Stats card -->
+  <div class="col-lg-4">
+
+    <!-- Avatar card -->
+    <div class="card border-0 shadow-sm mb-4 text-center overflow-hidden">
+      <div style="height:80px;background:linear-gradient(135deg,#1a2d6e,#405189,#0a7d6e)"></div>
+      <div class="card-body pt-0">
+        <div class="avatar-xl rounded-circle d-flex align-items-center justify-content-center mx-auto fw-bold text-white fs-28"
+             style="background:linear-gradient(135deg,#405189,#0ab39c);margin-top:-40px;border:4px solid #fff;box-shadow:0 4px 16px rgba(64,81,137,.3)">
+          {{ initials }}
+        </div>
+        <h5 class="mt-3 mb-1 fw-bold">{{ profile.firstName }} {{ profile.lastName }}</h5>
+        <p class="text-muted fs-13 mb-2">{{ profile.email }}</p>
+        <span class="badge bg-success-subtle text-success rounded-pill px-3">
+          <i class="ri-verified-badge-line me-1"></i>Compte vérifié
+        </span>
+        <div class="mt-3 pt-3 border-top">
+          <div class="d-flex justify-content-center gap-2">
+            <button class="btn btn-sm btn-primary rounded-pill px-3" (click)="startEdit()">
+              <i class="ri-edit-line me-1"></i>Modifier
+            </button>
+            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3"
+                    (click)="passwordMode = !passwordMode">
+              <i class="ri-lock-line me-1"></i>Mot de passe
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-transparent border-bottom py-3">
+        <h6 class="mb-0 fw-semibold fs-14">
+          <i class="ri-bar-chart-line me-2 text-primary"></i>Mon activité
+        </h6>
+      </div>
+      <div class="card-body p-0">
+        @for(stat of stats; track $index){
+        <div class="d-flex align-items-center justify-content-between px-3 py-3"
+             [class.border-bottom]="$index < stats.length - 1">
+          <div class="d-flex align-items-center gap-2">
+            <div class="avatar-xs rounded-circle bg-{{stat.color}}-subtle d-flex align-items-center justify-content-center">
+              <i class="{{stat.icon}} text-{{stat.color}} fs-14"></i>
+            </div>
+            <span class="text-muted fs-13">{{ stat.label }}</span>
+          </div>
+          <span class="fw-bold text-{{stat.color}} fs-15">{{ stat.value }}</span>
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Info + Forms -->
+  <div class="col-lg-8">
+
+    <!-- View Mode -->
+    @if(!editMode){
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-transparent border-bottom py-3 d-flex align-items-center justify-content-between">
+        <h6 class="mb-0 fw-semibold fs-14">
+          <i class="ri-user-line me-2 text-primary"></i>Informations personnelles
+        </h6>
+        <button class="btn btn-sm btn-primary rounded-pill px-3" (click)="startEdit()">
+          <i class="ri-edit-line me-1"></i>Modifier
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="row g-4">
+          <div class="col-sm-6">
+            <p class="text-muted fs-12 text-uppercase fw-semibold mb-1" style="letter-spacing:.8px">Prénom</p>
+            <p class="mb-0 fs-14 fw-medium">{{ profile.firstName }}</p>
+          </div>
+          <div class="col-sm-6">
+            <p class="text-muted fs-12 text-uppercase fw-semibold mb-1" style="letter-spacing:.8px">Nom</p>
+            <p class="mb-0 fs-14 fw-medium">{{ profile.lastName }}</p>
+          </div>
+          <div class="col-sm-6">
+            <p class="text-muted fs-12 text-uppercase fw-semibold mb-1" style="letter-spacing:.8px">Adresse e-mail</p>
+            <p class="mb-0 fs-14 fw-medium">{{ profile.email }}</p>
+          </div>
+          <div class="col-sm-6">
+            <p class="text-muted fs-12 text-uppercase fw-semibold mb-1" style="letter-spacing:.8px">Téléphone</p>
+            <p class="mb-0 fs-14 fw-medium">{{ profile.phone }}</p>
+          </div>
+          <div class="col-sm-6">
+            <p class="text-muted fs-12 text-uppercase fw-semibold mb-1" style="letter-spacing:.8px">Date de naissance</p>
+            <p class="mb-0 fs-14 fw-medium">{{ profile.birthDate }}</p>
+          </div>
+          <div class="col-sm-6">
+            <p class="text-muted fs-12 text-uppercase fw-semibold mb-1" style="letter-spacing:.8px">Genre</p>
+            <p class="mb-0 fs-14 fw-medium">{{ profile.gender }}</p>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-4 border-top">
+          <h6 class="fw-semibold fs-14 mb-3">
+            <i class="ri-map-pin-line me-2 text-success"></i>Adresse de livraison
+          </h6>
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <p class="text-muted fs-12 text-uppercase fw-semibold mb-1" style="letter-spacing:.8px">Rue</p>
+              <p class="mb-0 fs-14 fw-medium">{{ profile.address }}</p>
+            </div>
+            <div class="col-sm-6">
+              <p class="text-muted fs-12 text-uppercase fw-semibold mb-1" style="letter-spacing:.8px">Ville</p>
+              <p class="mb-0 fs-14 fw-medium">{{ profile.city }}</p>
+            </div>
+            <div class="col-sm-6">
+              <p class="text-muted fs-12 text-uppercase fw-semibold mb-1" style="letter-spacing:.8px">Code postal</p>
+              <p class="mb-0 fs-14 fw-medium">{{ profile.postalCode }}</p>
+            </div>
+            <div class="col-sm-6">
+              <p class="text-muted fs-12 text-uppercase fw-semibold mb-1" style="letter-spacing:.8px">Pays</p>
+              <p class="mb-0 fs-14 fw-medium">{{ profile.country }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Edit Mode -->
+    @if(editMode){
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-transparent border-bottom py-3 d-flex align-items-center justify-content-between">
+        <h6 class="mb-0 fw-semibold fs-14">
+          <i class="ri-edit-line me-2 text-primary"></i>Modifier mes informations
+        </h6>
+        <button class="btn btn-sm btn-outline-secondary rounded-pill" (click)="cancelEdit()">
+          <i class="ri-close-line me-1"></i>Annuler
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <label class="form-label fw-medium fs-13">Prénom</label>
+            <input type="text" class="form-control" [(ngModel)]="editData.firstName">
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label fw-medium fs-13">Nom</label>
+            <input type="text" class="form-control" [(ngModel)]="editData.lastName">
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label fw-medium fs-13">Adresse e-mail</label>
+            <input type="email" class="form-control" [(ngModel)]="editData.email">
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label fw-medium fs-13">Téléphone</label>
+            <input type="tel" class="form-control" [(ngModel)]="editData.phone">
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label fw-medium fs-13">Date de naissance</label>
+            <input type="date" class="form-control" [(ngModel)]="editData.birthDate">
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label fw-medium fs-13">Genre</label>
+            <select class="form-select" [(ngModel)]="editData.gender">
+              <option>Homme</option>
+              <option>Femme</option>
+            </select>
+          </div>
+
+          <div class="col-12 mt-2 pt-2 border-top">
+            <h6 class="fw-semibold fs-14 mb-3">
+              <i class="ri-map-pin-line me-2 text-success"></i>Adresse de livraison
+            </h6>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-medium fs-13">Rue</label>
+            <input type="text" class="form-control" [(ngModel)]="editData.address">
+          </div>
+          <div class="col-sm-4">
+            <label class="form-label fw-medium fs-13">Ville</label>
+            <input type="text" class="form-control" [(ngModel)]="editData.city">
+          </div>
+          <div class="col-sm-4">
+            <label class="form-label fw-medium fs-13">Code postal</label>
+            <input type="text" class="form-control" [(ngModel)]="editData.postalCode">
+          </div>
+          <div class="col-sm-4">
+            <label class="form-label fw-medium fs-13">Pays</label>
+            <input type="text" class="form-control" [(ngModel)]="editData.country">
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+          <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="cancelEdit()">
+            Annuler
+          </button>
+          <button type="button" class="btn btn-primary rounded-pill px-4" (click)="saveProfile()">
+            <i class="ri-save-line me-1"></i>Enregistrer
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Password Change -->
+    @if(passwordMode){
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-transparent border-bottom py-3 d-flex align-items-center justify-content-between">
+        <h6 class="mb-0 fw-semibold fs-14">
+          <i class="ri-lock-password-line me-2 text-warning"></i>Changer le mot de passe
+        </h6>
+        <button class="btn btn-sm btn-outline-secondary rounded-pill" (click)="passwordMode = false">
+          <i class="ri-close-line me-1"></i>Annuler
+        </button>
+      </div>
+      <div class="card-body">
+        @if(pwdError){
+        <div class="alert alert-danger border-0 d-flex align-items-center gap-2 py-2 fs-13">
+          <i class="ri-error-warning-line fs-16"></i>{{ pwdError }}
+        </div>
+        }
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label fw-medium fs-13">Mot de passe actuel</label>
+            <div class="position-relative">
+              <input [type]="showCurrent ? 'text' : 'password'"
+                     class="form-control pe-5" [(ngModel)]="passwords.current">
+              <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y pe-3 text-muted"
+                      (click)="showCurrent = !showCurrent">
+                <i class="{{showCurrent ? 'ri-eye-off-line' : 'ri-eye-line'}} fs-15"></i>
+              </button>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label fw-medium fs-13">Nouveau mot de passe</label>
+            <div class="position-relative">
+              <input [type]="showNew ? 'text' : 'password'"
+                     class="form-control pe-5" [(ngModel)]="passwords.newPwd">
+              <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y pe-3 text-muted"
+                      (click)="showNew = !showNew">
+                <i class="{{showNew ? 'ri-eye-off-line' : 'ri-eye-line'}} fs-15"></i>
+              </button>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label fw-medium fs-13">Confirmer le mot de passe</label>
+            <input type="password" class="form-control" [(ngModel)]="passwords.confirm">
+          </div>
+        </div>
+        <div class="d-flex justify-content-end gap-2 mt-4">
+          <button type="button" class="btn btn-outline-secondary rounded-pill px-4"
+                  (click)="passwordMode = false">Annuler</button>
+          <button type="button" class="btn btn-warning rounded-pill px-4" (click)="savePassword()">
+            <i class="ri-shield-check-line me-1"></i>Confirmer
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Preferences -->
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-transparent border-bottom py-3">
+        <h6 class="mb-0 fw-semibold fs-14">
+          <i class="ri-settings-3-line me-2 text-primary"></i>Préférences de notification
+        </h6>
+      </div>
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
+          <div>
+            <div class="fw-medium fs-14">Newsletter Tijara</div>
+            <div class="text-muted fs-12">Recevoir les offres et promotions exclusives</div>
+          </div>
+          <div class="form-check form-switch mb-0">
+            <input class="form-check-input" type="checkbox" [(ngModel)]="profile.newsletter"
+                   style="width:44px;height:22px;cursor:pointer">
+          </div>
+        </div>
+        <div class="d-flex align-items-center justify-content-between py-2">
+          <div>
+            <div class="fw-medium fs-14">Notifications commandes</div>
+            <div class="text-muted fs-12">Alertes de suivi et confirmation de livraison</div>
+          </div>
+          <div class="form-check form-switch mb-0">
+            <input class="form-check-input" type="checkbox" [(ngModel)]="profile.notifications"
+                   style="width:44px;height:22px;cursor:pointer">
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

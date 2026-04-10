@@ -1,0 +1,193 @@
+<app-breadcrumbs [title]="'Tableau de bord'" [breadcrumbItems]="breadCrumbItems"></app-breadcrumbs>
+
+<!-- ── BANNIÈRE BIENVENUE ─────────────────────────────────────────────────── -->
+<div class="card border-0 mb-4"
+     style="background:linear-gradient(135deg,#1a2d6e 0%,#405189 50%,#0ab39c 100%);border-radius:16px;overflow:hidden">
+  <div class="card-body py-4 px-4">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <div style="width:42px;height:42px;background:rgba(255,255,255,0.15);border-radius:12px;display:flex;align-items:center;justify-content:center">
+            <i class="ri-store-2-fill text-white fs-20"></i>
+          </div>
+          <div>
+            <h5 class="text-white mb-0 fw-bold">{{ shopName }}</h5>
+            <span style="color:rgba(255,255,255,0.65);font-size:12px">Marketplace Tijara</span>
+          </div>
+        </div>
+        <h4 class="text-white fw-bold mb-1">Bonjour, {{ vendorName }} 👋</h4>
+        <p class="mb-0" style="color:rgba(255,255,255,0.7)">Voici le résumé de votre activité pour mars 2026.</p>
+      </div>
+      <div class="d-flex gap-2 flex-wrap">
+        <a routerLink="/ent/products" class="btn btn-light btn-sm fw-medium">
+          <i class="ri-add-circle-line me-1"></i>Ajouter un produit
+        </a>
+        <a routerLink="/ent/orders" class="btn btn-outline-light btn-sm fw-medium">
+          <i class="ri-file-list-3-line me-1"></i>Voir commandes
+        </a>
+        <a routerLink="/ent/messages" class="btn btn-outline-light btn-sm fw-medium">
+          <i class="ri-chat-3-line me-1"></i>Messages
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── STATS KPI ──────────────────────────────────────────────────────────── -->
+<div class="row g-3 mb-4">
+  @for (s of stats; track s.label) {
+    <div class="col-6 col-xl-3">
+      <div class="card border-0 shadow-sm h-100" style="border-radius:14px">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-start justify-content-between mb-3">
+            <div style="width:46px;height:46px;border-radius:12px"
+                 class="bg-{{ s.color }}-subtle d-flex align-items-center justify-content-center">
+              <i class="{{ s.icon }} fs-22 text-{{ s.color }}"></i>
+            </div>
+            <span class="badge bg-success-subtle text-success fs-11 fw-medium">
+              <i class="ri-arrow-up-line"></i>{{ s.trend }}
+            </span>
+          </div>
+          <h3 class="fw-bold mb-0">{{ s.value }}</h3>
+          <p class="text-muted mb-0 fs-13 mt-1">{{ s.label }}</p>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+<!-- ── GRAPHIQUES ─────────────────────────────────────────────────────────── -->
+<div class="row g-4 mb-4">
+  <!-- Courbe ventes -->
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm h-100" style="border-radius:14px">
+      <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <h6 class="fw-bold mb-0">Évolution des ventes</h6>
+            <p class="text-muted fs-12 mb-0">Commandes & revenus — 2026</p>
+          </div>
+          <span class="badge bg-primary-subtle text-primary">Mars 2026</span>
+        </div>
+      </div>
+      <div class="card-body px-3 pb-2">
+        <apx-chart
+          [series]="areaSeries" [chart]="areaChart" [xaxis]="areaXAxis"
+          [stroke]="areaStroke" [fill]="areaFill" [dataLabels]="areaDataLabels"
+          [tooltip]="areaTooltip" [colors]="['#405189','#0ab39c']">
+        </apx-chart>
+      </div>
+    </div>
+  </div>
+
+  <!-- Donut répartition -->
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm h-100" style="border-radius:14px">
+      <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+        <h6 class="fw-bold mb-0">Répartition des ventes</h6>
+        <p class="text-muted fs-12 mb-0">Par catégorie de produit</p>
+      </div>
+      <div class="card-body">
+        <apx-chart
+          [series]="donutSeries" [chart]="donutChart" [labels]="donutLabels"
+          [legend]="donutLegend" [plotOptions]="donutPlotOptions"
+          [colors]="['#405189','#0ab39c','#f7b84b','#f06548']">
+        </apx-chart>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── COMMANDES RÉCENTES + TOP PRODUITS ─────────────────────────────────── -->
+<div class="row g-4">
+  <!-- Commandes récentes -->
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm" style="border-radius:14px">
+      <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+        <div class="d-flex align-items-center justify-content-between">
+          <h6 class="fw-bold mb-0">Commandes récentes</h6>
+          <a routerLink="/ent/orders" class="btn btn-sm btn-soft-primary">Voir tout</a>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th class="ps-4 fw-medium text-muted fs-12">Réf.</th>
+                <th class="fw-medium text-muted fs-12">Client</th>
+                <th class="fw-medium text-muted fs-12">Produit</th>
+                <th class="fw-medium text-muted fs-12">Total</th>
+                <th class="fw-medium text-muted fs-12">Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (o of recentOrders; track o.id) {
+                <tr>
+                  <td class="ps-4 fw-semibold text-primary fs-13">{{ o.id }}</td>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="d-flex align-items-center justify-content-center fw-bold text-white fs-12"
+                           style="width:30px;height:30px;border-radius:8px;background:#405189;flex-shrink:0">
+                        {{ o.client.charAt(0) }}
+                      </div>
+                      <span class="fs-13 fw-medium">{{ o.client }}</span>
+                    </div>
+                  </td>
+                  <td class="text-muted fs-13"
+                      style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                    {{ o.product }}
+                  </td>
+                  <td class="fw-semibold fs-13">{{ o.total | number }} DT</td>
+                  <td>
+                    <span class="badge {{ getStatusClass(o.status) }}">{{ o.status }}</span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top produits + Stock -->
+  <div class="col-lg-5">
+    <div class="card border-0 shadow-sm h-100" style="border-radius:14px">
+      <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+        <div class="d-flex align-items-center justify-content-between">
+          <h6 class="fw-bold mb-0">Top Produits — Stock</h6>
+          <a routerLink="/ent/products" class="btn btn-sm btn-soft-primary">Gérer</a>
+        </div>
+      </div>
+      <div class="card-body">
+        @for (p of topProducts; track p.name) {
+          <div class="mb-4">
+            <div class="d-flex align-items-center justify-content-between mb-1">
+              <div>
+                <span class="fw-semibold fs-14">{{ p.name }}</span>
+                <span class="text-muted fs-12 ms-2">{{ p.sales }} ventes</span>
+              </div>
+              <span class="fw-bold text-success fs-13">{{ p.revenue | number }} DT</span>
+            </div>
+            <div class="progress" style="height:6px;border-radius:10px">
+              <div class="progress-bar bg-primary" [style.width]="p.progress + '%'"
+                   style="border-radius:10px"></div>
+            </div>
+          </div>
+        }
+
+        <!-- Alerte stock faible -->
+        <div class="alert alert-warning border-0 rounded-3 d-flex align-items-center gap-2 mb-0 py-2 px-3"
+             style="background:#fff8ec">
+          <i class="ri-error-warning-line text-warning fs-18 flex-shrink-0"></i>
+          <div>
+            <div class="fw-semibold fs-13">Stock faible détecté</div>
+            <div class="text-muted fs-12">Tapis Yoga : 0 unité restante</div>
+          </div>
+          <a routerLink="/ent/products" class="btn btn-warning btn-sm ms-auto py-1">Réappro.</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
