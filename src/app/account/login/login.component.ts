@@ -38,13 +38,13 @@ export class LoginComponent implements OnInit, AfterViewInit {
     ) {
         // Si déjà connecté, rediriger directement
         try {
-            const raw = sessionStorage.getItem('currentUser');
+            const raw = localStorage.getItem('currentUser');
             if (raw) {
                 const user = JSON.parse(raw);
                 if (user?.role) { this.redirectByRole(user.role); }
             }
         } catch {
-            sessionStorage.removeItem('currentUser');
+            localStorage.removeItem('currentUser');
         }
     }
 
@@ -90,8 +90,8 @@ export class LoginComponent implements OnInit, AfterViewInit {
                     phone:     res.user.phone,
                     city:      res.user.city,
                 };
-                sessionStorage.setItem('toast', 'true');
-                sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                localStorage.setItem('toast', 'true');
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 this.redirectByRole(currentUser.role);
             },
             error: (err: any) => {
@@ -132,8 +132,8 @@ export class LoginComponent implements OnInit, AfterViewInit {
                     phone:     res.user.phone,
                     city:      res.user.city,
                 };
-                sessionStorage.setItem('toast', 'true');
-                sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                localStorage.setItem('toast', 'true');
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 this.redirectByRole(currentUser.role);
             },
             error: (err: any) => {

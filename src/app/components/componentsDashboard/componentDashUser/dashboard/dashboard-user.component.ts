@@ -41,8 +41,8 @@ export class DashboardUserComponent implements OnInit {
   constructor(private api: TijaraApiService) {}
 
   ngOnInit(): void {
-    // Nom depuis sessionStorage (instantané)
-    const stored = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+    // Nom depuis localStorage (instantané)
+    const stored = JSON.parse(localStorage.getItem('currentUser') || '{}');
     this.userName = stored.firstName || stored.email || 'Utilisateur';
 
     // Commandes réelles

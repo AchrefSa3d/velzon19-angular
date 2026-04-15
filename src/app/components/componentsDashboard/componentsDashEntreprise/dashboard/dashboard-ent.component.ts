@@ -55,7 +55,7 @@ export class DashboardEntComponent implements OnInit {
   constructor(private api: TijaraApiService) {}
 
   ngOnInit(): void {
-    const user = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+    const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
     this.vendorName = [user.firstName, user.lastName].filter(Boolean).join(' ') || 'Vendeur';
     this.shopName   = user.shopName || this.vendorName;
 

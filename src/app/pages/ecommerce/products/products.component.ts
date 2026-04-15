@@ -87,7 +87,7 @@ export class ProductsComponent implements OnInit {
   }
 
   loadCart() {
-    const saved = sessionStorage.getItem('tijara_cart');
+    const saved = localStorage.getItem('tijara_cart');
     this.cartItems = saved ? JSON.parse(saved) : [];
   }
 
@@ -139,7 +139,7 @@ export class ProductsComponent implements OnInit {
   addToCart(product: Product) {
     const existing = this.cartItems.find(i => i.product.id === product.id);
     if (existing) { existing.qty++; } else { this.cartItems.push({ product, qty: 1 }); }
-    sessionStorage.setItem('tijara_cart', JSON.stringify(this.cartItems));
+    localStorage.setItem('tijara_cart', JSON.stringify(this.cartItems));
     const btn = document.getElementById('cart-btn-' + product.id);
     if (btn) {
       btn.classList.add('btn-success');

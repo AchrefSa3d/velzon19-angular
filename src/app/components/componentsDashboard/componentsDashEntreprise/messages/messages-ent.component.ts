@@ -30,7 +30,7 @@ export class MessagesEntComponent implements OnInit, OnDestroy, AfterViewChecked
   constructor(private api: TijaraApiService) {}
 
   ngOnInit(): void {
-    const raw = sessionStorage.getItem('currentUser');
+    const raw = localStorage.getItem('currentUser');
     if (raw) { try { this.currentUserId = JSON.parse(raw).id; } catch {} }
     this.loadConversations();
     // Poll every 8 seconds for new messages

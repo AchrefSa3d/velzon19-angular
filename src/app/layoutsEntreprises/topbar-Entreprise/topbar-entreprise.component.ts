@@ -176,7 +176,10 @@ export class TopbarEntrepriseComponent implements OnInit {
    * Logout the user
    */
   logout() {
-    this.authService.logout();
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('token');
+    localStorage.removeItem('toast');
+    sessionStorage.clear();
     this.router.navigate(['/auth/login']);
   }
 

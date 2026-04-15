@@ -11,7 +11,7 @@ export class TijaraApiService {
   constructor(private http: HttpClient) {}
 
   private getHeaders(): HttpHeaders {
-    const currentUser = sessionStorage.getItem('currentUser');
+    const currentUser = localStorage.getItem('currentUser');
     let token = '';
     if (currentUser) {
       try { token = JSON.parse(currentUser).token || ''; } catch {}

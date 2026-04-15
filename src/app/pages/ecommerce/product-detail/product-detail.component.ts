@@ -43,10 +43,10 @@ export class ProductDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const saved = sessionStorage.getItem('tijara_cart');
+    const saved = localStorage.getItem('tijara_cart');
     this.cartItems = saved ? JSON.parse(saved) : [];
 
-    const raw = sessionStorage.getItem('currentUser');
+    const raw = localStorage.getItem('currentUser');
     if (raw) { try { this.currentUserId = JSON.parse(raw).id; } catch {} }
 
     this.route.paramMap.subscribe(params => {
@@ -131,7 +131,7 @@ export class ProductDetailComponent implements OnInit {
     if (!this.product) return;
     const existing = this.cartItems.find(i => i.product.id === this.product.id);
     if (existing) { existing.qty += this.quantity; } else { this.cartItems.push({ product: this.product, qty: this.quantity }); }
-    sessionStorage.setItem('tijara_cart', JSON.stringify(this.cartItems));
+    localStorage.setItem('tijara_cart', JSON.stringify(this.cartItems));
     this.addedToCart = true;
   }
 

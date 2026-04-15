@@ -31,12 +31,12 @@ export class CartComponent implements OnInit {
   ngOnInit(): void { this.loadCart(); }
 
   loadCart() {
-    const saved = sessionStorage.getItem('tijara_cart');
+    const saved = localStorage.getItem('tijara_cart');
     this.cartItems = saved ? JSON.parse(saved) : [];
   }
 
   saveCart() {
-    sessionStorage.setItem('tijara_cart', JSON.stringify(this.cartItems));
+    localStorage.setItem('tijara_cart', JSON.stringify(this.cartItems));
   }
 
   increase(item: CartItem) {

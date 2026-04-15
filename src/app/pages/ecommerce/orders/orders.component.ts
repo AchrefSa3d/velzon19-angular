@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { TijaraApiService } from 'src/app/core/services/tijara-api.service';
 
 @Component({
   selector: 'app-orders',
@@ -14,19 +15,38 @@ export class OrdersComponent implements OnInit {
     { label: 'Mes Commandes', active: true }
   ];
 
-  orders: any[] = [];
-  selectedOrder: any = null;
-  filterStatus = 'tous';
+  orders:        any[] = [];
+  selectedOrder: any   = null;
+  filterStatus         = 'tous';
+  loading              = true;
+  loadingDetail        = false;
 
-  constructor(private router: Router) {}
+  statuses = [
+    { value: 'tous',      label: 'Toutes'     },
+    { value: 'pending',   label: 'En attente' },
+    { value: 'confirmed', label: 'Confirmées' },
+    { value: 'shipped',   label: 'Expédiées'  },
+    { value: 'delivered', label: 'Livrées'    },
+    { value: 'cancelled', label: 'Annulées'   },
+  ];
 
-  ngOnInit(): void {
-    this.loadOrders();
+  countByStatus(status: string): number {
+    return this.orders.filter(o => o.status === status).length;
   }
 
-  loadOrders() {
-    const saved = sessionStorage.getItem('tijara_orders');
-    this.orders = saved ? JSON.parse(saved) : [];
+  constructor(private router: Router, private api: TijaraApiService) {}
+
+  ngOnInit(): void { this.loadOrders(); }
+
+  loadOrders(): void {
+    this.loading = true;
+    this.api.getOrders().subscribe({
+      next: (data: any[]) => {
+        this.orders  = data;
+        this.loading = false;
+      },
+      error: () => { this.loading = false; }
+    });
   }
 
   get filteredOrders(): any[] {
@@ -34,23 +54,42 @@ export class OrdersComponent implements OnInit {
     return this.orders.filter(o => o.status === this.filterStatus);
   }
 
+  showDetail(order: any): void {
+    this.loadingDetail = true;
+    this.selectedOrder = order; // afficher immédiatement
+    this.api.getOrder(order.id).subscribe({
+      next: (detail: any) => {
+        this.selectedOrder = detail;
+        this.loadingDetail = false;
+      },
+      error: () => { this.loadingDetail = false; }
+    });
+  }
+
+  closeDetail(): void { this.selectedOrder = null; }
+
+  orderLabel(id: number): string {
+    return `#${String(id).padStart(4, '0')}`;
+  }
+
   getStatusClass(status: string): string {
     switch (status) {
-      case 'En attente': return 'bg-warning-subtle text-warning';
-      case 'Confirmée':  return 'bg-info-subtle text-info';
-      case 'Livrée':     return 'bg-success-subtle text-success';
-      case 'Annulée':    return 'bg-danger-subtle text-danger';
-      default:           return 'bg-secondary-subtle text-secondary';
+      case 'pending':   return 'bg-warning-subtle text-warning';
+      case 'confirmed': return 'bg-info-subtle text-info';
+      case 'shipped':   return 'bg-primary-subtle text-primary';
+      case 'delivered': return 'bg-success-subtle text-success';
+      case 'cancelled': return 'bg-danger-subtle text-danger';
+      default:          return 'bg-secondary-subtle text-secondary';
     }
   }
 
-  showDetail(order: any) {
-    this.selectedOrder = order;
+  getStatusLabel(status: string): string {
+    const map: Record<string, string> = {
+      pending: 'En attente', confirmed: 'Confirmée',
+      shipped: 'Expédiée',   delivered: 'Livrée', cancelled: 'Annulée'
+    };
+    return map[status] || status;
   }
 
-  closeDetail() {
-    this.selectedOrder = null;
-  }
-
-  goShop() { this.router.navigate(['/shop/products']); }
+  goShop(): void { this.router.navigate(['/shop/products']); }
 }

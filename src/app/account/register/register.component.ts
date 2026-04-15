@@ -77,8 +77,8 @@ export class RegisterComponent implements OnInit, AfterViewInit {
                     firstName: res.user.firstName,
                     lastName:  res.user.lastName,
                 };
-                sessionStorage.setItem('toast', 'true');
-                sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                localStorage.setItem('toast', 'true');
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 this.router.navigate(['/users/dashboard']);
             },
             error: (err: any) => {

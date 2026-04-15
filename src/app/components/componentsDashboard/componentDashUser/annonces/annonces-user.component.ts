@@ -32,7 +32,7 @@ export class AnnoncesUserComponent implements OnInit {
   constructor(private api: TijaraApiService, private fb: FormBuilder) {}
 
   ngOnInit(): void {
-    const user = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+    const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
     this.currentUserId = user.id || 0;
     this.loadAll();
     this.loadMine();

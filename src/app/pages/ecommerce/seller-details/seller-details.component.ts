@@ -37,7 +37,7 @@ export class SellerDetailsComponent implements OnInit {
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (!id) { this.error = 'Vendeur introuvable.'; this.loading = false; return; }
-    const saved = sessionStorage.getItem('tijara_cart');
+    const saved = localStorage.getItem('tijara_cart');
     this.cartItems = saved ? JSON.parse(saved) : [];
 
     this.api.getVendorProfile(id).subscribe({
@@ -65,7 +65,7 @@ export class SellerDetailsComponent implements OnInit {
   }
 
   get isLoggedIn(): boolean {
-    return !!sessionStorage.getItem('currentUser');
+    return !!localStorage.getItem('currentUser');
   }
 
   getStars(rating: number): number[] {
@@ -75,7 +75,7 @@ export class SellerDetailsComponent implements OnInit {
   addToCart(product: any) {
     const existing = this.cartItems.find((i: any) => i.product.id === product.id);
     if (existing) { existing.qty++; } else { this.cartItems.push({ product, qty: 1 }); }
-    sessionStorage.setItem('tijara_cart', JSON.stringify(this.cartItems));
+    localStorage.setItem('tijara_cart', JSON.stringify(this.cartItems));
   }
 
   goDetail(id: number) { this.router.navigate(['/shop/product-detail', id]); }

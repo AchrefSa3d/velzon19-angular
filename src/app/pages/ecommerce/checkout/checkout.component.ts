@@ -41,14 +41,14 @@ export class CheckoutComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const saved = sessionStorage.getItem('tijara_cart');
+    const saved = localStorage.getItem('tijara_cart');
     this.cartItems = saved ? JSON.parse(saved) : [];
     if (this.cartItems.length === 0) {
       this.router.navigate(['/shop/cart']);
       return;
     }
 
-    const user = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+    const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
     this.checkoutForm = this.fb.group({
       firstName: [user.firstName || '', [Validators.required, Validators.minLength(2)]],
       lastName:  [user.lastName  || '', [Validators.required, Validators.minLength(2)]],
@@ -75,7 +75,7 @@ export class CheckoutComponent implements OnInit {
     if (this.checkoutForm.invalid) return;
 
     // Vérifier que l'utilisateur est connecté
-    const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     if (!currentUser?.token) {
       this.errorMsg = 'Vous devez être connecté pour passer une commande.';
       return;
@@ -98,7 +98,7 @@ export class CheckoutComponent implements OnInit {
       next: (res: any) => {
         this.loading    = false;
         this.orderNumber = `TJR-${String(res.id).padStart(6, '0')}`;
-        sessionStorage.removeItem('tijara_cart');
+        localStorage.removeItem('tijara_cart');
         this.cartItems  = [];
         this.orderPlaced = true;
       },

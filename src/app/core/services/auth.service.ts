@@ -100,17 +100,15 @@ export class AuthenticationService {
      * Logout the user
      */
     logout() {
-        this.store.dispatch(logout());
-        // logout the user
-        // return getFirebaseBackend()!.logout();
-        sessionStorage.removeItem('currentUser');
-        sessionStorage.removeItem('token');
+        // Nettoyer localStorage (stockage Tijara)
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('token');
+        localStorage.removeItem('toast');
+        localStorage.removeItem('tijara_cart');
+        // Nettoyer sessionStorage par sécurité
+        sessionStorage.clear();
         this.currentUserSubject.next(null!);
-
-        return of(undefined).pipe(
-        
-        );
-
+        return of(undefined);
     }
 
     /**

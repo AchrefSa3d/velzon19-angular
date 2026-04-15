@@ -67,7 +67,7 @@ export class TopbarUserComponent implements OnInit, OnDestroy {
   }
 
   loadUnreadMessages(): void {
-    const raw = sessionStorage.getItem('currentUser');
+    const raw = localStorage.getItem('currentUser');
     if (!raw) return;
     this.api.getConversations().subscribe({
       next: (data: any[]) => {
@@ -206,7 +206,11 @@ export class TopbarUserComponent implements OnInit, OnDestroy {
    * Logout the user
    */
   logout() {
-    this.authService.logout();
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('token');
+    localStorage.removeItem('toast');
+    localStorage.removeItem('tijara_cart');
+    sessionStorage.clear();
     this.router.navigate(['/auth/login']);
   }
 

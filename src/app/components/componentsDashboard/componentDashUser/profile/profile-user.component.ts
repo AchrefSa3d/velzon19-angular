@@ -46,7 +46,7 @@ export class ProfileUserComponent implements OnInit {
 
   ngOnInit(): void {
     try {
-      const raw = sessionStorage.getItem('currentUser');
+      const raw = localStorage.getItem('currentUser');
       if (raw) {
         const user = JSON.parse(raw);
         this.profile.firstName = user.firstName || user.first_name || '';

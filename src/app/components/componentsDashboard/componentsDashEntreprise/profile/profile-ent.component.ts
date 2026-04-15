@@ -43,7 +43,7 @@ export class ProfileEntComponent implements OnInit {
   constructor(private fb: FormBuilder, private api: TijaraApiService) {}
 
   ngOnInit(): void {
-    const user = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+    const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
     this.profileForm = this.fb.group({
       firstName:   [user.firstName || user.first_name || '',  [Validators.required]],
@@ -83,10 +83,10 @@ export class ProfileEntComponent implements OnInit {
   saveProfile() {
     this.submitted = true;
     if (this.profileForm.invalid) return;
-    // Mise à jour sessionStorage
-    const user = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+    // Mise à jour localStorage
+    const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
     const updated = { ...user, ...this.profileForm.value };
-    sessionStorage.setItem('currentUser', JSON.stringify(updated));
+    localStorage.setItem('currentUser', JSON.stringify(updated));
     this.saveSuccess = true;
     setTimeout(() => this.saveSuccess = false, 3000);
     this.submitted = false;

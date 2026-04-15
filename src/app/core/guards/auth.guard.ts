@@ -28,7 +28,7 @@ export class AuthGuard  {
                 return true;
             }
             // check if user data is in storage is logged in via API.
-            if(sessionStorage.getItem('currentUser')) {
+            if(localStorage.getItem('currentUser')) {
                 return true;
             }
         }
