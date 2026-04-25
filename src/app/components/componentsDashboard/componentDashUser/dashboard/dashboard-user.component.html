@@ -1,32 +1,29 @@
 <app-breadcrumbs title="Tableau de Bord" [breadcrumbItems]="breadcrumbItems"></app-breadcrumbs>
 
-<!-- Welcome Banner -->
+<!-- ─── Welcome Banner ───────────────────────────────────────────── -->
 <div class="row mb-4">
   <div class="col-12">
     <div class="card border-0 overflow-hidden position-relative"
-         style="background:linear-gradient(135deg,#1a2d6e 0%,#405189 55%,#0a7d6e 100%);min-height:160px">
+         style="background:linear-gradient(135deg,#1a2d6e 0%,#405189 55%,#0a7d6e 100%);min-height:170px">
       <div class="card-body p-4">
         <div class="row align-items-center">
           <div class="col-md-8">
             <div class="text-white">
               <p class="mb-1 fs-13 opacity-75">
-                <i class="ri-calendar-line me-1"></i>
-                {{ today | date:'EEEE d MMMM yyyy' }}
+                <i class="ri-calendar-line me-1"></i>{{ today | date:'EEEE d MMMM yyyy' }}
               </p>
               <h3 class="mb-2 fw-bold">
-                Bonjour, <span class="text-warning">{{ userName }}</span> &nbsp;👋
+                Bonjour, <span class="text-warning">{{ userName }}</span>&nbsp;👋
               </h3>
-              <p class="mb-3 fs-14" style="opacity:.8">
-                Bienvenue sur votre espace personnel Tijara. Gérez vos commandes,<br>
+              <p class="mb-3 fs-14" style="opacity:.85">
+                Bienvenue sur votre espace personnel Tijara. Gérez vos commandes,
                 suivez vos livraisons et explorez nos meilleures offres.
               </p>
               <div class="d-flex flex-wrap gap-2">
-                <a routerLink="/shop/products"
-                   class="btn btn-sm btn-light fw-semibold px-3">
+                <a routerLink="/shop/products" class="btn btn-sm btn-light fw-semibold px-3">
                   <i class="ri-shopping-bag-3-line me-1"></i>Parcourir la boutique
                 </a>
-                <a routerLink="/users/orders"
-                   class="btn btn-sm btn-outline-light px-3">
+                <a routerLink="/users/orders" class="btn btn-sm btn-outline-light px-3">
                   <i class="ri-file-list-3-line me-1"></i>Mes commandes
                 </a>
               </div>
@@ -50,37 +47,39 @@
           </div>
         </div>
       </div>
-      <!-- Decorative circles -->
       <div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.06)"></div>
       <div style="position:absolute;bottom:-60px;right:120px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
     </div>
   </div>
 </div>
 
-<!-- Stat Cards -->
+<!-- ─── Stat Cards (8 KPI compacts) ──────────────────────────────── -->
 <div class="row g-3 mb-4">
   @for(stat of stats; track $index){
-  <div class="col-6 col-xl-3">
-    <div class="card border-0 shadow-sm h-100" style="border-left:4px solid var(--vz-{{stat.color}}) !important">
-      <div class="card-body d-flex align-items-center gap-3">
-        <div class="avatar-md rounded-3 bg-{{stat.color}}-subtle d-flex align-items-center justify-content-center flex-shrink-0">
-          <i class="{{stat.icon}} fs-22 text-{{stat.color}}"></i>
-        </div>
-        <div>
-          <h2 class="mb-0 fw-bold text-{{stat.color}}">{{stat.value}}</h2>
-          <p class="text-muted mb-0 fs-13">{{stat.label}}</p>
+  <div class="col-6 col-md-4 col-xl-3">
+    <a [routerLink]="stat.link" class="text-decoration-none">
+      <div class="card border-0 shadow-sm h-100 stat-card" style="border-left:4px solid var(--vz-{{stat.color}}) !important;transition:all .25s">
+        <div class="card-body d-flex align-items-center gap-3 py-3">
+          <div class="avatar-md rounded-3 bg-{{stat.color}}-subtle d-flex align-items-center justify-content-center flex-shrink-0">
+            <i class="{{stat.icon}} fs-22 text-{{stat.color}}"></i>
+          </div>
+          <div class="flex-grow-1 min-width-0">
+            <h3 class="mb-0 fw-bold text-{{stat.color}}">{{stat.value}}</h3>
+            <p class="text-muted mb-0 fs-12 text-truncate">{{stat.label}}</p>
+          </div>
+          <i class="ri-arrow-right-s-line text-muted fs-18"></i>
         </div>
       </div>
-    </div>
+    </a>
   </div>
   }
 </div>
 
-<!-- Recent Orders + Categories -->
-<div class="row g-4">
+<!-- ─── Recent Orders + Activity ─────────────────────────────────── -->
+<div class="row g-4 mb-4">
 
   <!-- Recent Orders -->
-  <div class="col-lg-7">
+  <div class="col-lg-8">
     <div class="card border-0 shadow-sm h-100">
       <div class="card-header bg-transparent border-bottom pb-3 d-flex align-items-center justify-content-between">
         <h6 class="mb-0 fw-semibold">
@@ -91,48 +90,108 @@
         </a>
       </div>
       <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead>
-              <tr class="table-light">
-                <th class="ps-3 fs-12 text-muted fw-semibold border-0">N° CMD</th>
-                <th class="fs-12 text-muted fw-semibold border-0">Produit</th>
-                <th class="fs-12 text-muted fw-semibold border-0">Vendeur</th>
-                <th class="fs-12 text-muted fw-semibold border-0">Total</th>
-                <th class="fs-12 text-muted fw-semibold border-0">Statut</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for(order of recentOrders; track $index){
-              <tr>
-                <td class="ps-3">
-                  <span class="fw-semibold text-primary fs-13">{{ order.id }}</span>
-                </td>
-                <td>
-                  <span class="fs-13 d-block">{{ order.items }}</span>
-                  <span class="fs-11 text-muted">{{ order.date }}</span>
-                </td>
-                <td class="fs-13 text-muted">{{ order.vendor }}</td>
-                <td>
-                  <span class="fw-semibold fs-13">{{ order.total }} TND</span>
-                </td>
-                <td>
-                  <span class="{{ getStatusClass(order.status) }} rounded-pill px-2 py-1 fs-11">
-                    {{ order.status }}
-                  </span>
-                </td>
-              </tr>
-              }
-            </tbody>
-          </table>
-        </div>
+        @if (recentOrders.length === 0) {
+          <div class="text-center py-5">
+            <i class="ri-shopping-bag-line display-5 text-muted d-block mb-2"></i>
+            <p class="text-muted mb-3">Vous n'avez encore passé aucune commande.</p>
+            <a routerLink="/shop/products" class="btn btn-primary btn-sm">
+              <i class="ri-shopping-bag-3-line me-1"></i>Commencer mes achats
+            </a>
+          </div>
+        } @else {
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr class="table-light">
+                  <th class="ps-3 fs-12 text-muted fw-semibold border-0">N° CMD</th>
+                  <th class="fs-12 text-muted fw-semibold border-0">Date</th>
+                  <th class="fs-12 text-muted fw-semibold border-0">Vendeur</th>
+                  <th class="fs-12 text-muted fw-semibold border-0 text-end">Total</th>
+                  <th class="fs-12 text-muted fw-semibold border-0 text-center">Statut</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for(order of recentOrders; track $index){
+                <tr>
+                  <td class="ps-3"><span class="fw-semibold text-primary fs-13">{{ order.id }}</span></td>
+                  <td><span class="fs-12 text-muted">{{ order.date }}</span></td>
+                  <td class="fs-13 text-muted">{{ order.vendor }}</td>
+                  <td class="text-end fw-bold fs-13">{{ order.total | number:'1.2-2' }} TND</td>
+                  <td class="text-center">
+                    <span class="{{ getStatusClass(order.status) }} rounded-pill px-2 py-1 fs-11">
+                      {{ order.status }}
+                    </span>
+                  </td>
+                </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
       </div>
     </div>
   </div>
 
-  <!-- Categories -->
-  <div class="col-lg-5">
+  <!-- Activity panel -->
+  <div class="col-lg-4">
     <div class="card border-0 shadow-sm h-100">
+      <div class="card-header bg-transparent border-bottom pb-3">
+        <h6 class="mb-0 fw-semibold">
+          <i class="ri-pulse-line me-2 text-success"></i>Activité récente
+        </h6>
+      </div>
+      <div class="card-body">
+        <div class="timeline-panel">
+          <div class="d-flex gap-3 mb-3">
+            <div class="avatar-xs bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0">
+              <i class="ri-shopping-bag-3-line"></i>
+            </div>
+            <div>
+              <div class="fs-13 fw-semibold">{{ totalOrders }} commandes passées</div>
+              <div class="fs-11 text-muted">Depuis votre inscription</div>
+            </div>
+          </div>
+          <div class="d-flex gap-3 mb-3">
+            <div class="avatar-xs bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center flex-shrink-0">
+              <i class="ri-truck-line"></i>
+            </div>
+            <div>
+              <div class="fs-13 fw-semibold">{{ deliveredOrders }} colis livrés</div>
+              <div class="fs-11 text-muted">{{ deliveryRate }}% de taux de livraison</div>
+            </div>
+          </div>
+          <div class="d-flex gap-3 mb-3">
+            <div class="avatar-xs bg-danger-subtle text-danger rounded-circle d-flex align-items-center justify-content-center flex-shrink-0">
+              <i class="ri-heart-3-line"></i>
+            </div>
+            <div>
+              <div class="fs-13 fw-semibold">{{ wishlistCount }} articles favoris</div>
+              <div class="fs-11 text-muted">
+                <a routerLink="/users/wishlist" class="text-reset">Voir la liste →</a>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex gap-3">
+            <div class="avatar-xs bg-warning-subtle text-warning rounded-circle d-flex align-items-center justify-content-center flex-shrink-0">
+              <i class="ri-megaphone-line"></i>
+            </div>
+            <div>
+              <div class="fs-13 fw-semibold">{{ myProductsCount }} annonces publiées</div>
+              <div class="fs-11 text-muted">
+                <a routerLink="/users/my-products" class="text-reset">Gérer mes annonces →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Categories ───────────────────────────────────────────────── -->
+<div class="row">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
       <div class="card-header bg-transparent border-bottom pb-3">
         <h6 class="mb-0 fw-semibold">
           <i class="ri-apps-2-line me-2 text-primary"></i>Catégories populaires
@@ -141,8 +200,8 @@
       <div class="card-body">
         <div class="row g-3">
           @for(cat of categories; track $index){
-          <div class="col-6">
-            <a routerLink="/shop/products" class="text-decoration-none d-block">
+          <div class="col-6 col-md-4 col-lg-2">
+            <a routerLink="/shop/products" [queryParams]="{ category: cat.label }" class="text-decoration-none d-block">
               <div class="p-3 rounded-3 border h-100 category-card text-center"
                    style="transition:all .25s;cursor:pointer">
                 <div class="avatar-sm rounded-circle bg-{{cat.color}}-subtle d-flex align-items-center justify-content-center mx-auto mb-2">
@@ -160,30 +219,7 @@
   </div>
 </div>
 
-<!-- Quick Actions -->
-<div class="row g-3 mt-2">
-  <div class="col-12">
-    <div class="card border-0 shadow-sm">
-      <div class="card-body py-3">
-        <div class="d-flex flex-wrap align-items-center gap-3">
-          <span class="fw-semibold text-muted fs-13 me-2">Accès rapide :</span>
-          <a routerLink="/users/profile" class="btn btn-sm btn-outline-primary rounded-pill">
-            <i class="ri-user-line me-1"></i>Mon profil
-          </a>
-          <a routerLink="/users/orders" class="btn btn-sm btn-outline-success rounded-pill">
-            <i class="ri-file-list-3-line me-1"></i>Mes commandes
-          </a>
-          <a routerLink="/shop/cart" class="btn btn-sm btn-outline-info rounded-pill">
-            <i class="ri-shopping-cart-line me-1"></i>Mon panier
-          </a>
-          <a routerLink="/users/reclamations" class="btn btn-sm btn-outline-warning rounded-pill">
-            <i class="ri-customer-service-2-line me-1"></i>Mes réclamations
-          </a>
-          <a routerLink="/users/wishlist" class="btn btn-sm btn-outline-danger rounded-pill">
-            <i class="ri-heart-line me-1"></i>Mes favoris
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+<style>
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.08) !important; }
+.category-card:hover { background: var(--vz-light); transform: translateY(-2px); }
+</style>

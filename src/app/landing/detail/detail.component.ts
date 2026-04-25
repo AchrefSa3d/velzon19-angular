@@ -167,7 +167,7 @@ export class PublicDetailComponent implements OnInit {
         this.reviewSubmitting = true;
         this.reviewError      = '';
         const t = this.type === 'annonces' ? 'ad' : this.type === 'deals' ? 'deal' : 'product';
-        this.api.addReview(t, this.item.id, { rating: this.reviewRating, comment: this.reviewComment })
+        this.api.addReviewGeneric(t, this.item.id, { rating: this.reviewRating, comment: this.reviewComment })
             .subscribe({
                 next: () => {
                     this.reviewSubmitting = false;

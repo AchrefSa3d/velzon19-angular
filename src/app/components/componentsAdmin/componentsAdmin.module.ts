@@ -30,6 +30,12 @@ import { PrizesAdminComponent }       from './prizes-admin/prizes-admin.componen
 import { BoostPacksAdminComponent }   from './boost-packs-admin/boost-packs-admin.component';
 import { WinnersAdminComponent }      from './winners-admin/winners-admin.component';
 import { DealsAdminComponent }        from './deals-admin/deals-admin.component';
+import { PermissionsAdminComponent }  from './permissions-admin/permissions-admin.component';
+import { TransportsAdminComponent }   from './transports-admin/transports-admin.component';
+import { DeliveriesAdminComponent }   from './deliveries-admin/deliveries-admin.component';
+import { PaymentsAdminComponent }     from './payments-admin/payments-admin.component';
+import { ReportsAdminComponent }      from './reports-admin/reports-admin.component';
+import { InvoicesAdminComponent }     from './invoices-admin/invoices-admin.component';
 
 const routes: Routes = [
   { path: '',                   redirectTo: 'dashboard', pathMatch: 'full' },
@@ -53,6 +59,12 @@ const routes: Routes = [
   { path: 'boost-packs',        component: BoostPacksAdminComponent },
   { path: 'winners',            component: WinnersAdminComponent    },
   { path: 'deals',              component: DealsAdminComponent      },
+  { path: 'permissions',        component: PermissionsAdminComponent },
+  { path: 'transports',         component: TransportsAdminComponent  },
+  { path: 'deliveries',         component: DeliveriesAdminComponent  },
+  { path: 'payments',           component: PaymentsAdminComponent    },
+  { path: 'reports',            component: ReportsAdminComponent     },
+  { path: 'invoices',           component: InvoicesAdminComponent    },
   {
     path: 'reclamations',
     loadChildren: () => import('./reclamations/reclamations.module').then(m => m.ReclamationsModule),
@@ -82,6 +94,12 @@ const routes: Routes = [
     BoostPacksAdminComponent,
     WinnersAdminComponent,
     DealsAdminComponent,
+    PermissionsAdminComponent,
+    TransportsAdminComponent,
+    DeliveriesAdminComponent,
+    PaymentsAdminComponent,
+    ReportsAdminComponent,
+    InvoicesAdminComponent,
   ],
   imports: [
     CommonModule,

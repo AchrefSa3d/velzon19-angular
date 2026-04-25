@@ -173,16 +173,19 @@ export const MENU: MenuItem[] = [
     link: '/admin/boost-packs',
   },
 
+  // ─── LOGISTIQUE & FINANCE (LOT 3 + 6) ─────────────────────────────────────
+  { id: 100, label: 'Logistique & Finance', isTitle: true },
+  { id: 101, label: 'Transporteurs', icon: 'ri-truck-line',       link: '/admin/transports'  },
+  { id: 102, label: 'Livraisons',    icon: 'ri-route-line',       link: '/admin/deliveries'  },
+  { id: 103, label: 'Paiements',     icon: 'ri-bank-card-line',   link: '/admin/payments'    },
+  { id: 104, label: 'Factures',      icon: 'ri-file-text-line',   link: '/admin/invoices'    },
+  { id: 105, label: 'Rapports',      icon: 'ri-line-chart-line',  link: '/admin/reports'     },
+
+  // ─── SÉCURITÉ ─────────────────────────────────────────────────────────────
+  { id: 110, label: 'Sécurité', isTitle: true },
+  { id: 111, label: 'Permissions', icon: 'ri-shield-keyhole-line', link: '/admin/permissions' },
+
   // ─── CONFIGURATION ────────────────────────────────────────────────────────
-  {
-    id: 70,
-    label: 'Configuration',
-    isTitle: true
-  },
-  {
-    id: 71,
-    label: 'Paramètres',
-    icon: 'ri-settings-3-line',
-    link: '/admin/settings',
-  },
+  { id: 70, label: 'Configuration', isTitle: true },
+  { id: 71, label: 'Paramètres',    icon: 'ri-settings-3-line',   link: '/admin/settings'    },
 ];

@@ -428,11 +428,114 @@ export class TijaraApiService {
     return this.http.get(`${this.apiUrl}/reviews/summary`, { params: { type, targetId } });
   }
 
-  addReview(type: string, targetId: number, payload: { rating: number; comment?: string }): Observable<any> {
+  getMyReviews(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/reviews/my`, { headers: this.getHeaders() });
+  }
+
+  addReviewGeneric(type: string, targetId: number, payload: { rating: number; comment?: string }): Observable<any> {
     return this.http.post(`${this.apiUrl}/reviews?type=${type}&targetId=${targetId}`, payload, { headers: this.getHeaders() });
   }
 
-  deleteReview(id: number): Observable<any> {
+  deleteReviewGeneric(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/reviews/${id}`, { headers: this.getHeaders() });
+  }
+
+  // ═══ LOT 3 + 6 ═══════════════════════════════════════════════════════════
+
+  // ─── Permissions (admin) ─────────────────────────────────
+  getPermissions(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/permissions`, { headers: this.getHeaders() });
+  }
+  getPermissionsByRole(idRole: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/permissions/role/${idRole}`, { headers: this.getHeaders() });
+  }
+  savePermission(p: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/permissions`, p, { headers: this.getHeaders() });
+  }
+  updatePermission(id: number, p: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/permissions/${id}`, p, { headers: this.getHeaders() });
+  }
+  deletePermission(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/permissions/${id}`, { headers: this.getHeaders() });
+  }
+
+  // ─── Payments ────────────────────────────────────────────
+  createPayment(payload: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/payments`, payload, { headers: this.getHeaders() });
+  }
+  getMyPayments(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/payments/mine`, { headers: this.getHeaders() });
+  }
+  getAllPayments(status?: string): Observable<any> {
+    const params: any = status ? { status } : {};
+    return this.http.get(`${this.apiUrl}/payments`, { headers: this.getHeaders(), params });
+  }
+  refundPayment(id: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/payments/${id}/refund`, {}, { headers: this.getHeaders() });
+  }
+
+  // ─── Transports ──────────────────────────────────────────
+  getTransports(onlyActive = false): Observable<any> {
+    return this.http.get(`${this.apiUrl}/transports`, { params: { onlyActive } as any });
+  }
+  createTransport(t: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/transports`, t, { headers: this.getHeaders() });
+  }
+  updateTransport(id: number, t: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/transports/${id}`, t, { headers: this.getHeaders() });
+  }
+  toggleTransport(id: number): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/transports/${id}/toggle`, {}, { headers: this.getHeaders() });
+  }
+  deleteTransport(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/transports/${id}`, { headers: this.getHeaders() });
+  }
+
+  // ─── Deliveries ──────────────────────────────────────────
+  getDeliveries(status?: string): Observable<any> {
+    const params: any = status ? { status } : {};
+    return this.http.get(`${this.apiUrl}/deliveries`, { headers: this.getHeaders(), params });
+  }
+  createDelivery(d: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/deliveries`, d, { headers: this.getHeaders() });
+  }
+  updateDeliveryStatus(id: number, status: string): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/deliveries/${id}/status`, { status }, { headers: this.getHeaders() });
+  }
+
+  // ─── Invoices ────────────────────────────────────────────
+  getInvoices(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/invoices`, { headers: this.getHeaders() });
+  }
+  getInvoice(id: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/invoices/${id}`, { headers: this.getHeaders() });
+  }
+  generateInvoiceFromOrder(orderId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/invoices/from-order/${orderId}`, {}, { headers: this.getHeaders() });
+  }
+  markInvoicePaid(id: number): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/invoices/${id}/paid`, {}, { headers: this.getHeaders() });
+  }
+
+  // ─── Reports ─────────────────────────────────────────────
+  getReportOverview(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/reports/overview`, { headers: this.getHeaders() });
+  }
+  getSalesByMonth(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/reports/sales-by-month`, { headers: this.getHeaders() });
+  }
+  getTopProducts(limit = 10): Observable<any> {
+    return this.http.get(`${this.apiUrl}/reports/top-products`, { headers: this.getHeaders(), params: { limit } as any });
+  }
+  getTopCustomers(limit = 10): Observable<any> {
+    return this.http.get(`${this.apiUrl}/reports/top-customers`, { headers: this.getHeaders(), params: { limit } as any });
+  }
+
+  // ─── SMS ─────────────────────────────────────────────────
+  sendSms(recipient: string, message: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/sms`, { recipient, message }, { headers: this.getHeaders() });
+  }
+  getSmsLogs(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/sms`, { headers: this.getHeaders() });
   }
 }
