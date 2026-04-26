@@ -20,6 +20,7 @@ import { FollowersEntComponent }  from './followers/followers-ent.component';
 import { DeliveriesEntComponent } from './deliveries/deliveries-ent.component';
 import { ReportsEntComponent }    from './reports/reports-ent.component';
 import { InvoicesEntComponent }   from './invoices/invoices-ent.component';
+import { BoostPacksEntComponent } from './boost-packs/boost-packs-ent.component';
 
 const routes: Routes = [
   { path: '',           redirectTo: 'dashboard', pathMatch: 'full' },
@@ -35,6 +36,7 @@ const routes: Routes = [
   // Reports retiré du menu — toutes les statistiques sont fusionnées dans le Tableau de bord
   { path: 'reports',    redirectTo: 'dashboard' },
   { path: 'invoices',   component: InvoicesEntComponent   },
+  { path: 'boost-packs', component: BoostPacksEntComponent },
   {
     path: 'reclamations',
     loadChildren: () => import('../commonComponentsDash/reclamations/reclamations.module').then(m => m.ReclamationsModule),
@@ -54,6 +56,7 @@ const routes: Routes = [
     DeliveriesEntComponent,
     ReportsEntComponent,
     InvoicesEntComponent,
+    BoostPacksEntComponent,
   ],
   imports: [
     CommonModule,

@@ -172,6 +172,14 @@ export class TopbarComponent implements OnInit {
     this.languageService.setLanguage(lang);
   }
 
+  get displayName(): string {
+    if (!this.userData) return 'Client';
+    return [this.userData.firstName, this.userData.lastName].filter(Boolean).join(' ')
+        || this.userData.username
+        || this.userData.email
+        || 'Client';
+  }
+
   /**
    * Logout the user
    */

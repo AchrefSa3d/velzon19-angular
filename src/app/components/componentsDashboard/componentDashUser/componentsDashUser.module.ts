@@ -18,6 +18,8 @@ import { MyReviewsUserComponent }  from './my-reviews/my-reviews-user.component'
 import { MyInvoicesUserComponent } from './my-invoices/my-invoices-user.component';
 import { MyDeliveriesUserComponent } from './my-deliveries/my-deliveries-user.component';
 import { PaymentUserComponent }    from './payment/payment-user.component';
+import { CouponsUserComponent }    from './coupons/coupons-user.component';
+import { PrizesUserComponent }     from './prizes/prizes-user.component';
 
 const routes: Routes = [
   { path: '',             redirectTo: 'dashboard', pathMatch: 'full' },
@@ -32,6 +34,8 @@ const routes: Routes = [
   { path: 'my-invoices',   component: MyInvoicesUserComponent },
   { path: 'my-deliveries', component: MyDeliveriesUserComponent },
   { path: 'payment',       component: PaymentUserComponent },
+  { path: 'coupons',       component: CouponsUserComponent },
+  { path: 'prizes',        component: PrizesUserComponent  },
   {
     path: 'reclamations',
     loadChildren: () =>
@@ -53,6 +57,8 @@ const routes: Routes = [
     MyInvoicesUserComponent,
     MyDeliveriesUserComponent,
     PaymentUserComponent,
+    CouponsUserComponent,
+    PrizesUserComponent,
   ],
   imports: [
     CommonModule,

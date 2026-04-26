@@ -1,0 +1,49 @@
+// ─── Polish horizontal client menu ─────────────────────────────────────
+:host ::ng-deep .navbar-nav {
+  .nav-link {
+    transition: all .15s ease;
+    border-radius: 6px;
+    padding: 0.6rem 1rem !important;
+    font-weight: 500;
+    color: #4b5675;
+
+    &:hover {
+      background: rgba(10, 179, 156, .07);
+      color: #0ab39c;
+    }
+
+    &.active,
+    &.router-link-active {
+      background: linear-gradient(135deg, rgba(10,179,156,.12), rgba(64,81,137,.12));
+      color: #405189 !important;
+      font-weight: 600;
+    }
+
+    .nav-icon {
+      font-size: 18px;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+
+    .badge {
+      margin-left: 6px;
+      font-size: 9px;
+      padding: 3px 7px;
+      vertical-align: middle;
+    }
+  }
+
+  .menu-title {
+    color: #98a6ad;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    font-weight: 700;
+    padding: 12px 20px 6px;
+  }
+}
+
+:host ::ng-deep .navbar-brand-box {
+  padding: 16px 12px !important;
+  .logo-lg .badge { letter-spacing:.5px; vertical-align:middle; }
+}

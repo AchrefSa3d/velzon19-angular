@@ -1,181 +1,195 @@
 import { Component, OnInit } from '@angular/core';
 import { TijaraApiService } from 'src/app/core/services/tijara-api.service';
 
+interface DealRow {
+  id: number;
+  title: string;
+  description: string;
+  price: string;
+  discount: number;
+  image: string;
+  category: string;
+  vendorName: string;
+  shopName: string;
+  isActive: boolean;
+  date: string | null;
+  quantity: number;
+}
+
 @Component({
   selector: 'app-deals-admin',
   standalone: false,
   template: `
-<div class="container-fluid">
-  <app-breadcrumbs [breadcrumbItems]="breadCrumbItems"></app-breadcrumbs>
+<app-breadcrumbs title="Deals & Promotions" [breadcrumbItems]="breadCrumbItems"></app-breadcrumbs>
 
-  <!-- Stats bar -->
-  <div class="row g-3 mb-4">
-    @for (s of stats; track s.label) {
-      <div class="col-6 col-md-3">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body d-flex align-items-center gap-3 p-3">
-            <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
-                 style="width:44px;height:44px" [style.background]="s.bg">
-              <i [class]="s.icon + ' fs-20'" [style.color]="s.color"></i>
-            </div>
-            <div>
-              <div class="fw-bold fs-20">{{ s.value }}</div>
-              <div class="fs-12 text-muted">{{ s.label }}</div>
-            </div>
-          </div>
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm h-100" style="border-left:4px solid #f06548">
+      <div class="card-body d-flex align-items-center gap-3 py-3">
+        <div class="avatar-md rounded-3 bg-danger-subtle d-flex align-items-center justify-content-center">
+          <i class="ri-flashlight-line fs-22 text-danger"></i>
         </div>
+        <div><h3 class="mb-0 fw-bold text-danger">{{ items.length }}</h3>
+        <p class="mb-0 fs-12 text-muted">Total deals</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm h-100" style="border-left:4px solid #0ab39c">
+      <div class="card-body d-flex align-items-center gap-3 py-3">
+        <div class="avatar-md rounded-3 bg-success-subtle d-flex align-items-center justify-content-center">
+          <i class="ri-checkbox-circle-line fs-22 text-success"></i>
+        </div>
+        <div><h3 class="mb-0 fw-bold text-success">{{ activeCount }}</h3>
+        <p class="mb-0 fs-12 text-muted">Actifs</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm h-100" style="border-left:4px solid #f7b84b">
+      <div class="card-body d-flex align-items-center gap-3 py-3">
+        <div class="avatar-md rounded-3 bg-warning-subtle d-flex align-items-center justify-content-center">
+          <i class="ri-time-line fs-22 text-warning"></i>
+        </div>
+        <div><h3 class="mb-0 fw-bold text-warning">{{ items.length - activeCount }}</h3>
+        <p class="mb-0 fs-12 text-muted">En attente</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm h-100" style="border-left:4px solid #299cdb">
+      <div class="card-body d-flex align-items-center gap-3 py-3">
+        <div class="avatar-md rounded-3 bg-info-subtle d-flex align-items-center justify-content-center">
+          <i class="ri-percent-line fs-22 text-info"></i>
+        </div>
+        <div><h3 class="mb-0 fw-bold text-info">{{ avgDiscount | number:'1.0-0' }}%</h3>
+        <p class="mb-0 fs-12 text-muted">Réduction moyenne</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-transparent d-flex flex-wrap align-items-center gap-2 py-3">
+    <h6 class="mb-0 fw-semibold flex-grow-1">
+      <i class="ri-flashlight-line me-2 text-danger"></i>Tous les deals
+      <span class="badge bg-danger-subtle text-danger ms-2">{{ filtered.length }}</span>
+    </h6>
+    <div class="input-group input-group-sm" style="max-width:240px">
+      <span class="input-group-text bg-white border-end-0"><i class="ri-search-line"></i></span>
+      <input type="text" class="form-control border-start-0" placeholder="Titre, vendeur, catégorie…"
+             [(ngModel)]="search" (input)="applyFilter()" />
+    </div>
+    <div class="btn-group btn-group-sm">
+      <button class="btn" [class.btn-danger]="filter===''"        [class.btn-light]="filter!==''"        (click)="setFilter('')">Tous</button>
+      <button class="btn" [class.btn-danger]="filter==='active'"  [class.btn-light]="filter!=='active'"  (click)="setFilter('active')">Actifs</button>
+      <button class="btn" [class.btn-danger]="filter==='pending'" [class.btn-light]="filter!=='pending'" (click)="setFilter('pending')">En attente</button>
+    </div>
+  </div>
+
+  <div class="card-body p-0">
+    @if (loading) {
+      <div class="text-center py-5"><div class="spinner-border text-danger"></div></div>
+    } @else if (filtered.length === 0) {
+      <div class="text-center py-5">
+        <i class="ri-flashlight-line display-3 text-muted opacity-50"></i>
+        <p class="text-muted mt-2 mb-0">Aucun deal ne correspond.</p>
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="ps-3" style="width:80px">Image</th>
+              <th>Deal</th>
+              <th>Vendeur</th>
+              <th>Catégorie</th>
+              <th class="text-end">Prix</th>
+              <th class="text-center">Réduction</th>
+              <th class="text-center">Stock</th>
+              <th class="text-center">Statut</th>
+              <th class="text-end pe-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (d of filtered; track d.id) {
+              <tr>
+                <td class="ps-3">
+                  @if (d.image) {
+                    <img [src]="d.image" alt="" class="rounded" width="48" height="48"
+                         style="object-fit:cover" (error)="d.image=''" />
+                  } @else {
+                    <div class="rounded bg-danger-subtle text-danger
+                                d-flex align-items-center justify-content-center"
+                         style="width:48px;height:48px">
+                      <i class="ri-flashlight-line fs-20"></i>
+                    </div>
+                  }
+                </td>
+                <td>
+                  <div class="fs-13 fw-semibold text-truncate" style="max-width:240px">{{ d.title }}</div>
+                  <div class="fs-11 text-muted">ID #{{ d.id }} · {{ formatDate(d.date) }}</div>
+                </td>
+                <td class="fs-12">
+                  <div class="fw-semibold">{{ d.vendorName || '—' }}</div>
+                  @if (d.shopName) { <div class="text-muted">{{ d.shopName }}</div> }
+                </td>
+                <td class="fs-12 text-muted">{{ d.category || '—' }}</td>
+                <td class="text-end fw-semibold fs-13">{{ d.price }} TND</td>
+                <td class="text-center">
+                  @if (d.discount > 0) {
+                    <span class="badge bg-danger">-{{ d.discount }}%</span>
+                  } @else {
+                    <span class="text-muted">—</span>
+                  }
+                </td>
+                <td class="text-center fs-12">
+                  @if (d.quantity > 0) {
+                    <span class="badge bg-success-subtle text-success">{{ d.quantity }}</span>
+                  } @else {
+                    <span class="badge bg-secondary-subtle text-secondary">∞</span>
+                  }
+                </td>
+                <td class="text-center">
+                  @if (d.isActive) {
+                    <span class="badge bg-success-subtle text-success">Actif</span>
+                  } @else {
+                    <span class="badge bg-warning-subtle text-warning">En attente</span>
+                  }
+                </td>
+                <td class="text-end pe-3">
+                  <div class="btn-group btn-group-sm">
+                    <button class="btn btn-light" (click)="toggleActive(d)" [title]="d.isActive ? 'Désactiver' : 'Activer'">
+                      <i [class]="d.isActive ? 'ri-pause-circle-line text-warning' : 'ri-play-circle-line text-success'"></i>
+                    </button>
+                    <button class="btn btn-light" (click)="remove(d)" title="Supprimer">
+                      <i class="ri-delete-bin-line text-danger"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
       </div>
     }
   </div>
-
-  <!-- Filters -->
-  <div class="row g-2 mb-3 align-items-center">
-    <div class="col">
-      <div class="d-flex gap-2">
-        @for (f of filters; track f.key) {
-          <button class="btn btn-sm"
-                  [class]="activeFilter===f.key ? f.activeClass : 'btn-outline-secondary'"
-                  (click)="setFilter(f.key)">
-            {{ f.label }}
-          </button>
-        }
-      </div>
-    </div>
-    <div class="col-auto">
-      <input type="text" class="form-control form-control-sm" style="width:230px"
-             placeholder="Rechercher un deal..." [(ngModel)]="searchTerm" (input)="applyFilter()">
-    </div>
-  </div>
-
-  <!-- Table -->
-  @if (loading) {
-    <div class="text-center py-5">
-      <div class="spinner-border text-primary"></div>
-    </div>
-  } @else {
-    <div class="card border-0 shadow-sm">
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead style="background:#f8f9fc">
-              <tr>
-                <th class="ps-3">Deal</th>
-                <th>Vendeur</th>
-                <th>Prix</th>
-                <th>Catégorie</th>
-                <th>Date</th>
-                <th>Statut</th>
-                <th class="text-end pe-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @if (filtered.length === 0) {
-                <tr>
-                  <td colspan="7" class="text-center py-5 text-muted">
-                    <i class="ri-price-tag-3-line fs-36 d-block mb-2 opacity-30"></i>
-                    Aucun deal trouvé
-                  </td>
-                </tr>
-              }
-              @for (d of filtered; track d.id) {
-                <tr>
-                  <td class="ps-3">
-                    <div class="d-flex align-items-center gap-3">
-                      <div class="rounded-2 overflow-hidden flex-shrink-0"
-                           style="width:44px;height:44px;background:#f3f4f8">
-                        @if (d.image) {
-                          <img [src]="d.image" style="width:100%;height:100%;object-fit:cover" alt="">
-                        } @else {
-                          <div class="d-flex align-items-center justify-content-center h-100">
-                            <i class="ri-price-tag-3-line text-muted fs-20"></i>
-                          </div>
-                        }
-                      </div>
-                      <div>
-                        <div class="fw-medium fs-14 text-truncate" style="max-width:220px">{{ d.title }}</div>
-                        <div class="fs-12 text-muted">ID #{{ d.id }}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="fw-medium fs-13">{{ d.vendor_name }}</div>
-                    @if (d.shop_name) {
-                      <div class="fs-12 text-muted">{{ d.shop_name }}</div>
-                    }
-                  </td>
-                  <td>
-                    <span class="fw-semibold text-primary">{{ d.price }} TND</span>
-                    @if (d.discount) {
-                      <div class="badge bg-danger-subtle text-danger fs-10">-{{ d.discount }}%</div>
-                    }
-                  </td>
-                  <td>
-                    <span class="badge bg-light text-dark border">{{ d.category || '—' }}</span>
-                  </td>
-                  <td class="text-muted fs-12">{{ d.date | date:'dd/MM/yyyy' }}</td>
-                  <td>
-                    <span class="badge rounded-pill"
-                          [class]="d.is_active ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'">
-                      {{ d.is_active ? 'Actif' : 'En attente' }}
-                    </span>
-                  </td>
-                  <td class="text-end pe-3">
-                    <div class="d-flex justify-content-end gap-1">
-                      <button class="btn btn-sm"
-                              [class]="d.is_active ? 'btn-outline-warning' : 'btn-outline-success'"
-                              [title]="d.is_active ? 'Désactiver' : 'Activer'"
-                              (click)="toggle(d)">
-                        <i [class]="d.is_active ? 'ri-eye-off-line' : 'ri-check-line'"></i>
-                      </button>
-                      <button class="btn btn-sm btn-outline-danger" title="Supprimer" (click)="remove(d)">
-                        <i class="ri-delete-bin-line"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Pagination footer -->
-        <div class="px-3 py-2 d-flex align-items-center justify-content-between border-top bg-light">
-          <span class="text-muted fs-12">{{ filtered.length }} deal(s) affiché(s)</span>
-        </div>
-      </div>
-    </div>
-  }
 </div>
-  `
+`,
 })
 export class DealsAdminComponent implements OnInit {
-  breadCrumbItems = [
-    { label: 'Admin' },
-    { label: 'Gestion Deals', active: true }
-  ];
+  breadCrumbItems = [{ label: 'Admin' }, { label: 'Deals', active: true }];
 
-  allDeals: any[]  = [];
-  filtered: any[]  = [];
-  loading          = true;
-  activeFilter     = 'all';
-  searchTerm       = '';
+  items: DealRow[]    = [];
+  filtered: DealRow[] = [];
+  search = '';
+  filter = '';
+  loading = true;
 
-  filters = [
-    { key: 'all',     label: 'Tous',        activeClass: 'btn-primary'  },
-    { key: 'active',  label: 'Actifs',       activeClass: 'btn-success' },
-    { key: 'pending', label: 'En attente',   activeClass: 'btn-warning' },
-  ];
-
-  get stats() {
-    const total   = this.allDeals.length;
-    const actifs  = this.allDeals.filter(d => d.is_active).length;
-    const pending = this.allDeals.filter(d => !d.is_active).length;
-    return [
-      { label: 'Total Deals',  value: total,   icon: 'ri-price-tag-3-line',  bg: '#eef2ff', color: '#405189' },
-      { label: 'Actifs',       value: actifs,  icon: 'ri-check-double-line', bg: '#d1fae5', color: '#059669' },
-      { label: 'En attente',   value: pending, icon: 'ri-time-line',         bg: '#fef3c7', color: '#d97706' },
-      { label: 'Ce mois',      value: total,   icon: 'ri-calendar-line',     bg: '#f0fdf4', color: '#0ab39c' },
-    ];
+  get activeCount(): number { return this.items.filter(d => d.isActive).length; }
+  get avgDiscount(): number {
+    const arr = this.items.filter(d => d.discount > 0);
+    return arr.length ? arr.reduce((s, d) => s + d.discount, 0) / arr.length : 0;
   }
 
   constructor(private api: TijaraApiService) {}
@@ -184,48 +198,57 @@ export class DealsAdminComponent implements OnInit {
 
   load(): void {
     this.loading = true;
-    this.api.adminList('deals').subscribe({
+    this.api.getAdminDeals().subscribe({
       next: (data: any[]) => {
-        this.allDeals = data;
-        this.loading  = false;
+        this.items = (data || []).map((d: any) => ({
+          id:          +d.id,
+          title:        d.title       ?? '—',
+          description:  d.description ?? '',
+          price:        String(d.price ?? '0'),
+          discount:    +(d.discount   ?? 0),
+          image:        d.image       ?? '',
+          category:     d.category    ?? '',
+          vendorName:   d.vendor_name ?? '',
+          shopName:     d.shop_name   ?? '',
+          isActive:    !!d.is_active,
+          date:         d.date        ?? null,
+          quantity:    +(d.quantity   ?? 0),
+        }));
         this.applyFilter();
+        this.loading = false;
       },
-      error: () => {
-        this.allDeals = [];
-        this.loading  = false;
-        this.applyFilter();
-      }
+      error: () => { this.loading = false; alert('Chargement impossible.'); }
     });
-  }
-
-  setFilter(key: string): void {
-    this.activeFilter = key;
-    this.applyFilter();
   }
 
   applyFilter(): void {
-    let list = this.allDeals;
-    if (this.activeFilter === 'active')  list = list.filter(d =>  d.is_active);
-    if (this.activeFilter === 'pending') list = list.filter(d => !d.is_active);
-    const q = this.searchTerm.toLowerCase();
-    if (q) list = list.filter(d =>
-      (d.title || '').toLowerCase().includes(q) ||
-      (d.vendor_name || '').toLowerCase().includes(q) ||
-      (d.category    || '').toLowerCase().includes(q)
-    );
-    this.filtered = list;
-  }
-
-  toggle(d: any): void {
-    this.api.adminPatch('deals/' + d.id + '/toggle').subscribe({
-      next: () => this.load()
+    const s = this.search.trim().toLowerCase();
+    this.filtered = this.items.filter(d => {
+      if (s && !`${d.title} ${d.vendorName} ${d.shopName} ${d.category}`.toLowerCase().includes(s)) return false;
+      if (this.filter === 'active'  && !d.isActive) return false;
+      if (this.filter === 'pending' &&  d.isActive) return false;
+      return true;
     });
   }
+  setFilter(f: string): void { this.filter = f; this.applyFilter(); }
 
-  remove(d: any): void {
+  toggleActive(d: DealRow): void {
+    this.api.adminPatch(`deals/${d.id}/toggle`).subscribe({
+      next: () => { d.isActive = !d.isActive; this.applyFilter(); },
+      error: () => alert('Action impossible.'),
+    });
+  }
+  remove(d: DealRow): void {
     if (!confirm(`Supprimer le deal "${d.title}" ?`)) return;
     this.api.adminDelete('deals', d.id).subscribe({
-      next: () => this.load()
+      next: () => { this.items = this.items.filter(x => x.id !== d.id); this.applyFilter(); },
+      error: () => alert('Suppression impossible.'),
     });
+  }
+
+  formatDate(d: string | null): string {
+    if (!d) return '—';
+    const dt = new Date(d);
+    return isNaN(dt.getTime()) ? '—' : dt.toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' });
   }
 }

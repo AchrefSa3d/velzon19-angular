@@ -148,9 +148,16 @@ export class ReportsAdminComponent implements OnInit {
 
   private normalize(o: any): any {
     if (!o) return {};
-    const out: any = {};
+    const out: any = { ...o };
     for (const k of Object.keys(o)) {
-      out[k.charAt(0).toLowerCase() + k.slice(1)] = o[k];
+      // PascalCase → camelCase
+      const camelP = k.charAt(0).toLowerCase() + k.slice(1);
+      if (!(camelP in out)) out[camelP] = o[k];
+      // snake_case → camelCase
+      if (k.includes('_')) {
+        const camelS = k.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+        if (!(camelS in out)) out[camelS] = o[k];
+      }
     }
     return out;
   }

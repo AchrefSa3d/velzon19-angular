@@ -105,6 +105,14 @@ export class TopbarUserComponent implements OnInit, OnDestroy {
     return (fn + ln).toUpperCase() || 'U';
   }
 
+  get displayName(): string {
+    if (!this.userData) return 'Client';
+    return [this.userData.firstName, this.userData.lastName].filter(Boolean).join(' ')
+        || this.userData.username
+        || this.userData.email
+        || 'Client';
+  }
+
   markAllRead(): void {
     this.api.markAllNotificationsRead().subscribe({
       next: () => {

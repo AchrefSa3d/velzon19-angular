@@ -10,6 +10,27 @@ type Perm = { idPermission?: number; idRole: number; resource: string;
   template: `
 <app-breadcrumbs title="Permissions" [breadcrumbItems]="breadcrumbItems"></app-breadcrumbs>
 
+<div class="row g-3 mb-4">
+  @for (r of roles; track r.id) {
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100" [style.borderLeft]="'4px solid ' + r.color">
+        <div class="card-body d-flex align-items-center gap-3 py-3">
+          <div class="avatar-md rounded-3 d-flex align-items-center justify-content-center" [style.background]="r.color + '22'">
+            <i class="fs-22" [class]="r.icon" [style.color]="r.color"></i>
+          </div>
+          <div class="flex-grow-1">
+            <h3 class="mb-0 fw-bold" [style.color]="r.color">{{ countOf(r.id) }}</h3>
+            <p class="mb-0 fs-12 text-muted">Permissions {{ r.label }}</p>
+          </div>
+          <button class="btn btn-sm btn-light" (click)="setRole(r.id)" [class.shadow]="currentRole===r.id">
+            <i class="ri-eye-line"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
 <div class="card border-0 shadow-sm">
   <div class="card-header bg-transparent d-flex flex-wrap align-items-center gap-3 py-3">
     <h6 class="mb-0 fw-semibold flex-grow-1">
@@ -112,10 +133,12 @@ export class PermissionsAdminComponent implements OnInit {
   breadcrumbItems = [{ label: 'Admin', active: false }, { label: 'Permissions', active: true }];
 
   roles = [
-    { id: 1, label: 'Admin' },
-    { id: 3, label: 'Vendor' },
-    { id: 2, label: 'Client' },
+    { id: 1, label: 'Admin',  color: '#f06548', icon: 'ri-shield-user-line' },
+    { id: 3, label: 'Vendor', color: '#0ab39c', icon: 'ri-store-2-line' },
+    { id: 2, label: 'Client', color: '#405189', icon: 'ri-user-3-line' },
   ];
+
+  countOf(roleId: number): number { return this.items.filter(p => p.idRole === roleId).length; }
 
   currentRole = 1;
   items: Perm[] = [];
@@ -133,13 +156,13 @@ export class PermissionsAdminComponent implements OnInit {
     this.api.getPermissions().subscribe({
       next: (r: any[]) => {
         this.items = (r || []).map((p: any) => ({
-          idPermission: p.idPermission ?? p.IdPermission,
-          idRole:       p.idRole       ?? p.IdRole,
-          resource:     p.resource     ?? p.Resource,
-          canRead:      !!(p.canRead   ?? p.CanRead),
-          canCreate:    !!(p.canCreate ?? p.CanCreate),
-          canUpdate:    !!(p.canUpdate ?? p.CanUpdate),
-          canDelete:    !!(p.canDelete ?? p.CanDelete),
+          idPermission: p.id_permission ?? p.idPermission ?? p.IdPermission,
+          idRole:      +(p.id_role      ?? p.idRole       ?? p.IdRole ?? 0),
+          resource:     p.resource      ?? p.Resource     ?? '',
+          canRead:    !!(p.can_read     ?? p.canRead      ?? p.CanRead),
+          canCreate:  !!(p.can_create   ?? p.canCreate    ?? p.CanCreate),
+          canUpdate:  !!(p.can_update   ?? p.canUpdate    ?? p.CanUpdate),
+          canDelete:  !!(p.can_delete   ?? p.canDelete    ?? p.CanDelete),
         }));
         this.applyFilter();
         this.loading = false;

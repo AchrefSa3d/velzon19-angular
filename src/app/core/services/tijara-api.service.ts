@@ -258,6 +258,14 @@ export class TijaraApiService {
     return this.http.get(`${this.apiUrl}/admin/users/${id}`, { headers: this.getHeaders() });
   }
 
+  deleteAdminUser(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/admin/users/${id}`, { headers: this.getHeaders() });
+  }
+
+  toggleAdminUser(id: number): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/admin/users/${id}/toggle`, {}, { headers: this.getHeaders() });
+  }
+
   // ─── Admin ──────────────────────────────────────────────
   getAdminStats(): Observable<any> {
     return this.http.get(`${this.apiUrl}/admin/stats`, { headers: this.getHeaders() });
@@ -474,6 +482,20 @@ export class TijaraApiService {
     return this.http.post(`${this.apiUrl}/payments/${id}/refund`, {}, { headers: this.getHeaders() });
   }
 
+  // ─── Public catalog (admin → users/vendors) ──────────────
+  getPublicCoupons(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/coupons`);
+  }
+  getPublicPrizes(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/prizes`);
+  }
+  getPublicBoostPacks(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/boost-packs`, { headers: this.getHeaders() });
+  }
+  getPublicWinners(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/winners`);
+  }
+
   // ─── Transports ──────────────────────────────────────────
   getTransports(onlyActive = false): Observable<any> {
     return this.http.get(`${this.apiUrl}/transports`, { params: { onlyActive } as any });
@@ -501,6 +523,9 @@ export class TijaraApiService {
   }
   updateDeliveryStatus(id: number, status: string): Observable<any> {
     return this.http.patch(`${this.apiUrl}/deliveries/${id}/status`, { status }, { headers: this.getHeaders() });
+  }
+  updateDelivery(id: number, d: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/deliveries/${id}`, d, { headers: this.getHeaders() });
   }
 
   // ─── Invoices ────────────────────────────────────────────

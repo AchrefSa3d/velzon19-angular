@@ -45,7 +45,7 @@
                                     <li class="nav-item">
                                         @if(hasItems(subitem)){
                                         <a class="nav-link" href="javascript:void(0);" [attr.data-parent]="subitem.parentId" data-bs-toggle="collapse" aria-expanded="false" (click)="toggleSubItem($event)">
-                                            @if(subitem.icon){<i class="bx {{ subitem.icon }} icon nav-icon" class=""></i>}{{ subitem.label | translate}}
+                                            @if(subitem.icon){<i class="{{ subitem.icon }} icon nav-icon me-1"></i>}{{ subitem.label | translate}}
                                         </a>
 
                                         <div class="collapse menu-dropdown">
@@ -79,7 +79,7 @@
                                         </div>
                                         }@else {
                                         <a [routerLink]="subitem.link" class="nav-link" [attr.data-parent]="subitem.parentId" (click)="updateActive($event)">
-                                            @if(subitem.icon){<i class="bx {{ subitem.icon }} icon nav-icon" class=""></i>}{{ subitem.label | translate}}
+                                            @if(subitem.icon){<i class="{{ subitem.icon }} icon nav-icon me-1"></i>}{{ subitem.label | translate}}
                                         </a>
                                         }
                                     </li>
@@ -93,7 +93,7 @@
                     </div>
                     }@else{
                     <a [routerLink]="item.link" class="side-nav-link-ref nav-link menu-link 123">
-                        @if(item.icon){<i class="bx {{ item.icon }} icon nav-icon" class=""></i>}
+                        @if(item.icon){<i class="{{ item.icon }} icon nav-icon"></i>}
                         <span class=""> {{ item.label | translate }}</span>
                         @if(item.badge){<span class="badge {{item.badge.variant}} float-end">{{item.badge.text |
                             translate}}</span>}

@@ -51,7 +51,15 @@ import { TijaraApiService } from 'src/app/core/services/tijara-api.service';
 
 <div class="card border-0 shadow-sm">
   <div class="card-header bg-transparent d-flex flex-wrap align-items-center gap-2 py-3">
-    <h6 class="mb-0 fw-semibold flex-grow-1"><i class="ri-bank-card-line me-2 text-primary"></i>Historique des paiements</h6>
+    <h6 class="mb-0 fw-semibold flex-grow-1">
+      <i class="ri-bank-card-line me-2 text-primary"></i>Historique des paiements
+      <span class="badge bg-primary-subtle text-primary ms-2">{{ filtered.length }}</span>
+    </h6>
+    <div class="input-group input-group-sm" style="max-width:240px">
+      <span class="input-group-text bg-white border-end-0"><i class="ri-search-line"></i></span>
+      <input type="text" class="form-control border-start-0" placeholder="Référence, client, commande…"
+             [(ngModel)]="search" (input)="applyFilter()" />
+    </div>
     <div class="btn-group btn-group-sm">
       <button class="btn" [class.btn-primary]="filter===''"         [class.btn-light]="filter!==''"         (click)="setFilter('')">Tous</button>
       <button class="btn" [class.btn-primary]="filter==='paid'"     [class.btn-light]="filter!=='paid'"     (click)="setFilter('paid')">Payés</button>
@@ -116,6 +124,7 @@ export class PaymentsAdminComponent implements OnInit {
   filtered: any[] = [];
   loading = true;
   filter = '';
+  search = '';
 
   get totalPaid(): number { return this.items.filter(p => p.status === 'paid').reduce((s, p) => s + (+p.amount || 0), 0); }
   get refundCount(): number { return this.items.filter(p => p.status === 'refunded').length; }
@@ -129,16 +138,16 @@ export class PaymentsAdminComponent implements OnInit {
     this.api.getAllPayments().subscribe({
       next: (r: any[]) => {
         this.items = (r || []).map((p: any) => ({
-          idPayment:     p.idPayment     ?? p.IdPayment,
-          idOrder:       p.idOrder       ?? p.IdOrder,
-          amount:        p.amount        ?? p.Amount,
-          method:        p.method        ?? p.Method,
-          status:        p.status        ?? p.Status,
-          reference:     p.reference     ?? p.Reference,
-          transactionId: p.transactionId ?? p.TransactionId,
-          createdAt:     p.createdAt     ?? p.CreatedAt,
-          email:         p.email         ?? p.Email,
-          userName:      p.userName      ?? p.UserName,
+          idPayment:     p.id_payment     ?? p.idPayment     ?? p.IdPayment ?? 0,
+          idOrder:       p.id_order       ?? p.idOrder       ?? p.IdOrder,
+          amount:       +(p.amount        ?? p.Amount        ?? 0),
+          method:        p.method         ?? p.Method        ?? '',
+          status:        p.status         ?? p.Status        ?? 'pending',
+          reference:     p.reference      ?? p.Reference     ?? '',
+          transactionId: p.transaction_id ?? p.transactionId ?? p.TransactionId ?? '',
+          createdAt:     p.created_at     ?? p.createdAt     ?? p.CreatedAt,
+          email:         p.email          ?? p.Email         ?? '',
+          userName:      p.user_name      ?? p.userName      ?? p.UserName ?? '',
         }));
         this.applyFilter();
         this.loading = false;
@@ -148,7 +157,14 @@ export class PaymentsAdminComponent implements OnInit {
   }
 
   setFilter(f: string): void { this.filter = f; this.applyFilter(); }
-  applyFilter(): void { this.filtered = !this.filter ? [...this.items] : this.items.filter(p => p.status === this.filter); }
+  applyFilter(): void {
+    const s = this.search.trim().toLowerCase();
+    this.filtered = this.items.filter(p => {
+      if (s && !`${p.reference} ${p.userName} ${p.email} ${p.idOrder}`.toLowerCase().includes(s)) return false;
+      if (this.filter && p.status !== this.filter) return false;
+      return true;
+    });
+  }
 
   refund(p: any): void {
     if (!confirm(`Rembourser ${p.amount} TND ?`)) return;

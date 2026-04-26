@@ -1,34 +1,331 @@
-import { Component } from '@angular/core';
-import { CrudConfig } from '../crud-generic/admin-crud.component';
+import { Component, OnInit } from '@angular/core';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { TijaraApiService } from 'src/app/core/services/tijara-api.service';
+
+interface CityRow {
+  id: number;
+  title: string;
+  titleEn: string;
+  titleAr: string;
+  idCountry: number;
+  countryName: string;
+  image: string;
+  active: boolean;
+}
 
 @Component({
-    selector: 'app-cities-admin',
-    template: `<app-admin-crud [config]="config"></app-admin-crud>`,
-    standalone: false
+  selector: 'app-cities-admin',
+  standalone: false,
+  template: `
+<app-breadcrumbs title="Villes" [breadcrumbItems]="breadCrumbItems"></app-breadcrumbs>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm h-100" style="border-left:4px solid #0ab39c">
+      <div class="card-body d-flex align-items-center gap-3 py-3">
+        <div class="avatar-md rounded-3 bg-success-subtle d-flex align-items-center justify-content-center">
+          <i class="ri-building-line fs-22 text-success"></i>
+        </div>
+        <div><h3 class="mb-0 fw-bold text-success">{{ items.length }}</h3>
+        <p class="mb-0 fs-12 text-muted">Total villes</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm h-100" style="border-left:4px solid #405189">
+      <div class="card-body d-flex align-items-center gap-3 py-3">
+        <div class="avatar-md rounded-3 bg-primary-subtle d-flex align-items-center justify-content-center">
+          <i class="ri-earth-line fs-22 text-primary"></i>
+        </div>
+        <div><h3 class="mb-0 fw-bold text-primary">{{ countries.length }}</h3>
+        <p class="mb-0 fs-12 text-muted">Pays disponibles</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm h-100" style="border-left:4px solid #0ab39c">
+      <div class="card-body d-flex align-items-center gap-3 py-3">
+        <div class="avatar-md rounded-3 bg-success-subtle d-flex align-items-center justify-content-center">
+          <i class="ri-checkbox-circle-line fs-22 text-success"></i>
+        </div>
+        <div><h3 class="mb-0 fw-bold text-success">{{ activeCount }}</h3>
+        <p class="mb-0 fs-12 text-muted">Actives</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm h-100" style="border-left:4px solid #f06548">
+      <div class="card-body d-flex align-items-center gap-3 py-3">
+        <div class="avatar-md rounded-3 bg-danger-subtle d-flex align-items-center justify-content-center">
+          <i class="ri-close-circle-line fs-22 text-danger"></i>
+        </div>
+        <div><h3 class="mb-0 fw-bold text-danger">{{ items.length - activeCount }}</h3>
+        <p class="mb-0 fs-12 text-muted">Désactivées</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-transparent d-flex flex-wrap align-items-center gap-2 py-3">
+    <h6 class="mb-0 fw-semibold flex-grow-1">
+      <i class="ri-building-line me-2 text-success"></i>Liste des villes
+      <span class="badge bg-success-subtle text-success ms-2">{{ filtered.length }}</span>
+    </h6>
+    <div class="input-group input-group-sm" style="max-width:240px">
+      <span class="input-group-text bg-white border-end-0"><i class="ri-search-line"></i></span>
+      <input type="text" class="form-control border-start-0" placeholder="Nom (FR/EN/AR)…"
+             [(ngModel)]="search" (input)="applyFilter()" />
+    </div>
+    <select class="form-select form-select-sm" style="max-width:180px"
+            [(ngModel)]="filterCountry" (change)="applyFilter()">
+      <option [ngValue]="0">Tous les pays</option>
+      @for (c of countries; track c.id) { <option [ngValue]="c.id">{{ c.title }}</option> }
+    </select>
+    <button class="btn btn-sm btn-success" (click)="openAdd()">
+      <i class="ri-add-line me-1"></i>Nouvelle ville
+    </button>
+  </div>
+
+  <div class="card-body p-0">
+    @if (loading) {
+      <div class="text-center py-5"><div class="spinner-border text-success"></div></div>
+    } @else if (filtered.length === 0) {
+      <div class="text-center py-5">
+        <i class="ri-building-line display-3 text-muted opacity-50"></i>
+        <p class="text-muted mt-2 mb-3">Aucune ville.</p>
+        <button class="btn btn-success" (click)="openAdd()"><i class="ri-add-line"></i> Créer la première</button>
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="ps-3" style="width:80px">Image</th>
+              <th>Ville (FR)</th>
+              <th>EN</th>
+              <th>AR</th>
+              <th>Pays</th>
+              <th class="text-center">Statut</th>
+              <th class="text-end pe-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of filtered; track c.id) {
+              <tr>
+                <td class="ps-3">
+                  @if (c.image) {
+                    <img [src]="c.image" alt="" class="rounded" width="48" height="48"
+                         style="object-fit:cover" (error)="c.image=''" />
+                  } @else {
+                    <div class="rounded bg-success-subtle text-success d-flex align-items-center justify-content-center"
+                         style="width:48px;height:48px">
+                      <i class="ri-building-line fs-20"></i>
+                    </div>
+                  }
+                </td>
+                <td class="fs-13 fw-semibold">{{ c.title || '—' }}</td>
+                <td class="fs-12 text-muted">{{ c.titleEn || '—' }}</td>
+                <td class="fs-12 text-muted" dir="rtl">{{ c.titleAr || '—' }}</td>
+                <td class="fs-12">
+                  @if (c.countryName) {
+                    <span class="badge bg-primary-subtle text-primary"><i class="ri-earth-line me-1"></i>{{ c.countryName }}</span>
+                  } @else { <span class="text-muted">—</span> }
+                </td>
+                <td class="text-center">
+                  @if (c.active) { <span class="badge bg-success-subtle text-success">Active</span> }
+                  @else          { <span class="badge bg-secondary-subtle text-secondary">Inactive</span> }
+                </td>
+                <td class="text-end pe-3">
+                  <div class="btn-group btn-group-sm">
+                    <button class="btn btn-light" (click)="openEdit(c)" title="Modifier">
+                      <i class="ri-edit-2-line text-info"></i>
+                    </button>
+                    <button class="btn btn-light" (click)="toggleActive(c)" [title]="c.active ? 'Désactiver' : 'Activer'">
+                      <i [class]="c.active ? 'ri-pause-circle-line text-warning' : 'ri-play-circle-line text-success'"></i>
+                    </button>
+                    <button class="btn btn-light" (click)="remove(c)" title="Supprimer">
+                      <i class="ri-delete-bin-line text-danger"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>
+
+@if (showForm) {
+  <div class="modal fade show d-block" tabindex="-1" style="background:rgba(0,0,0,.5)" (click)="cancel($event)">
+    <div class="modal-dialog modal-lg modal-dialog-centered" (click)="$event.stopPropagation()">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-success-subtle">
+          <h5 class="modal-title fw-bold text-success">
+            <i class="ri-building-line me-2"></i>{{ editingId ? 'Modifier la ville' : 'Nouvelle ville' }}
+          </h5>
+          <button type="button" class="btn-close" (click)="cancel()"></button>
+        </div>
+        <div class="modal-body">
+          @if (saveError) {
+            <div class="alert alert-danger fs-13"><i class="ri-error-warning-line me-2"></i>{{ saveError }}</div>
+          }
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fs-12 fw-semibold">Nom (FR) *</label>
+              <input class="form-control form-control-sm" [(ngModel)]="form.title" placeholder="Ex : Tunis" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fs-12 fw-semibold">Pays *</label>
+              <select class="form-select form-select-sm" [(ngModel)]="form.idCountry">
+                <option [ngValue]="0">— Sélectionner —</option>
+                @for (c of countries; track c.id) { <option [ngValue]="c.id">{{ c.title }}</option> }
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fs-12 fw-semibold">Nom (EN)</label>
+              <input class="form-control form-control-sm" [(ngModel)]="form.titleEn" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fs-12 fw-semibold">Nom (AR)</label>
+              <input class="form-control form-control-sm" [(ngModel)]="form.titleAr" dir="rtl" />
+            </div>
+            <div class="col-md-9">
+              <label class="form-label fs-12 fw-semibold">URL image</label>
+              <input class="form-control form-control-sm" [(ngModel)]="form.image" placeholder="https://…" />
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+              @if (form.image) {
+                <img [src]="form.image" alt="" class="rounded" width="60" height="60" style="object-fit:cover" (error)="$any($event.target).src=''" />
+              }
+            </div>
+            <div class="col-12">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="city-active" [(ngModel)]="form.active" />
+                <label class="form-check-label fs-13" for="city-active">Ville active</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-light" (click)="cancel()" [disabled]="saving">Annuler</button>
+          <button class="btn btn-success" (click)="save()" [disabled]="saving">
+            @if (saving) { <span class="spinner-border spinner-border-sm me-1"></span> }
+            <i class="ri-save-line me-1"></i> Enregistrer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+`,
 })
-export class CitiesAdminComponent {
-    config: CrudConfig = {
-        title:       'Villes',
-        icon:        'ri-building-line',
-        apiPath:     'cities',
-        idField:     'id_city',
-        breadcrumb:  'Villes',
-        searchFields: ['title', 'title_en', 'title_ar'],
-        listColumns: [
-            { key: 'id_city',    label: 'ID' },
-            { key: 'title',      label: 'Nom (FR)' },
-            { key: 'title_en',   label: 'EN' },
-            { key: 'title_ar',   label: 'AR' },
-            { key: 'id_country', label: 'Pays ID' },
-            { key: 'active',     label: 'Statut', type: 'badge' },
-        ],
-        fields: [
-            { key: 'title',      label: 'Nom (FR)',  type: 'text', required: true, colSize: 6 },
-            { key: 'id_country', label: 'ID pays',   type: 'number', colSize: 6, min: 0 },
-            { key: 'title_en',   label: 'Nom (EN)',  type: 'text', colSize: 6 },
-            { key: 'title_ar',   label: 'Nom (AR)',  type: 'text', colSize: 6 },
-            { key: 'image',      label: 'URL image', type: 'text', colSize: 12 },
-            { key: 'active',     label: 'Actif',     type: 'boolean', default: true, colSize: 6 },
-        ],
+export class CitiesAdminComponent implements OnInit {
+  breadCrumbItems = [{ label: 'Admin' }, { label: 'Villes', active: true }];
+
+  items: CityRow[]    = [];
+  filtered: CityRow[] = [];
+  countries: { id: number; title: string }[] = [];
+  search = '';
+  filterCountry = 0;
+  loading = true;
+
+  showForm = false;
+  saving   = false;
+  saveError = '';
+  editingId: number | null = null;
+  form = { title: '', titleEn: '', titleAr: '', idCountry: 0, image: '', active: true };
+
+  get activeCount(): number { return this.items.filter(c => c.active).length; }
+
+  constructor(private api: TijaraApiService) {}
+
+  ngOnInit(): void { this.load(); }
+
+  load(): void {
+    this.loading = true;
+    forkJoin({
+      cities:    this.api.adminList('cities').pipe(catchError(() => of([] as any[]))),
+      countries: this.api.adminList('countries').pipe(catchError(() => of([] as any[]))),
+    }).subscribe(({ cities, countries }) => {
+      this.countries = (countries || []).map((c: any) => ({
+        id:    +(c.id_country ?? c.IdCountry ?? c.id ?? 0),
+        title:  c.title       ?? c.Title     ?? '',
+      })).filter((c: any) => c.id > 0);
+
+      const cmap = new Map(this.countries.map(c => [c.id, c.title]));
+      this.items = (cities || []).map((c: any) => {
+        const idCountry = +(c.id_country ?? c.IdCountry ?? 0);
+        return {
+          id:        +(c.id_city ?? c.IdCity ?? c.id ?? 0),
+          title:      c.title    ?? c.Title    ?? '',
+          titleEn:    c.title_en ?? c.TitleEn  ?? '',
+          titleAr:    c.title_ar ?? c.TitleAr  ?? '',
+          idCountry,
+          countryName: cmap.get(idCountry) || '',
+          image:      c.image    ?? c.Image    ?? '',
+          active:   !!(c.active  ?? c.Active  ?? true),
+        };
+      });
+      this.applyFilter();
+      this.loading = false;
+    });
+  }
+
+  applyFilter(): void {
+    const s = this.search.trim().toLowerCase();
+    this.filtered = this.items.filter(c => {
+      if (s && !`${c.title} ${c.titleEn} ${c.titleAr}`.toLowerCase().includes(s)) return false;
+      if (this.filterCountry > 0 && c.idCountry !== this.filterCountry) return false;
+      return true;
+    });
+  }
+
+  openAdd(): void {
+    this.editingId = null; this.saveError = '';
+    this.form = { title: '', titleEn: '', titleAr: '', idCountry: 0, image: '', active: true };
+    this.showForm = true;
+  }
+  openEdit(c: CityRow): void {
+    this.editingId = c.id; this.saveError = '';
+    this.form = { title: c.title, titleEn: c.titleEn, titleAr: c.titleAr, idCountry: c.idCountry, image: c.image, active: c.active };
+    this.showForm = true;
+  }
+  cancel(_ev?: Event): void { this.showForm = false; this.saving = false; this.saveError = ''; }
+
+  save(): void {
+    if (!this.form.title.trim()) { this.saveError = 'Le nom est requis.'; return; }
+    if (!this.form.idCountry)    { this.saveError = 'Choisissez un pays.';    return; }
+    this.saving = true; this.saveError = '';
+    const payload = {
+      Title: this.form.title, IdCountry: this.form.idCountry, TitleEn: this.form.titleEn,
+      TitleAr: this.form.titleAr, Image: this.form.image, Active: this.form.active,
     };
+    const op = this.editingId
+      ? this.api.adminUpdate('cities', this.editingId, payload)
+      : this.api.adminCreate('cities', payload);
+    op.subscribe({
+      next: () => { this.saving = false; this.showForm = false; this.load(); },
+      error: (err) => { this.saving = false; this.saveError = err?.error?.message || 'Erreur d\'enregistrement.'; },
+    });
+  }
+
+  toggleActive(c: CityRow): void {
+    this.api.adminUpdate('cities', c.id, {
+      Title: c.title, IdCountry: c.idCountry, TitleEn: c.titleEn, TitleAr: c.titleAr, Image: c.image, Active: !c.active,
+    }).subscribe({
+      next: () => { c.active = !c.active; this.applyFilter(); },
+      error: () => alert('Action impossible.'),
+    });
+  }
+  remove(c: CityRow): void {
+    if (!confirm(`Supprimer la ville "${c.title}" ?`)) return;
+    this.api.adminDelete('cities', c.id).subscribe({
+      next: () => { this.items = this.items.filter(x => x.id !== c.id); this.applyFilter(); },
+      error: () => alert('Suppression impossible.'),
+    });
+  }
 }
